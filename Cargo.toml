@@ -1,0 +1,11 @@
+[package]
+name = "salat_mv"
+version = "0.2.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ansi_term = "0.12.1"
+chrono = "0.4.23"
+clap = { version = "4.0.29", features = ["derive"] }
