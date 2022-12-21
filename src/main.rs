@@ -2,6 +2,7 @@ use std::{io::Error, env};
 use std::fs;
 use chrono::prelude::*;
 
+
 struct PrayerData{
     island_index:i32,
     day: i32,
@@ -24,9 +25,9 @@ impl PrayerData{
         self.magrib = val[6];
         self.isha   = val[7];
     }
-
+    
     fn print_data(&self){
-        println!("Fajr:\t{}\nShuruq:\t{}\nDhuhur:\t{}\nAsr:\t{}\nMagrib:\t{}\nIsha:\t{}\n",
+        println!("Fajr:\t{}\nShuruq:\t{}\nDhuhur:\t{}\nAsr:\t{}\nMagrib:\t{}\nIsha:\t{}",
                 self.fajr   .minutes_to_time(),
                 self.sun    .minutes_to_time(),
                 self.dhuhur .minutes_to_time(),
@@ -34,9 +35,8 @@ impl PrayerData{
                 self.magrib .minutes_to_time(),
                 self.isha   .minutes_to_time()
                 )
-
+        
     }
-
 }
 
 
@@ -59,19 +59,19 @@ impl TimeConversion for i32{
         if hour < 10{
             full_time_string.push('0');
         }
-       
+        
         full_time_string.push_str(&hour.to_string());
         full_time_string.push(':');
-
+        
         if minute < 10{
             full_time_string.push('0');
         }
         full_time_string.push_str(&minute.to_string());
         full_time_string.push(' ');
         full_time_string.push_str(time);
-
+        
         full_time_string
-
+        
     }
 }
 
@@ -81,53 +81,131 @@ trait PTDataParse {
 
 impl PTDataParse for String{
     fn parse_for_island(self, island_index:i32) -> Vec<PrayerData>{
-
-    
+        
+        
         let mut grouped :Vec<&str> = self.split('\n').collect();
         grouped.pop();
         grouped.reverse();
         grouped.pop();
         grouped.reverse();
-
+        
         let mut full_list :Vec<PrayerData> = vec![];
-
+        
         for group in grouped{
             let columns :Vec<&str> = group.split(';').collect();
-
+            
             if island_index != columns[0].parse::<i32>().unwrap(){
                 continue;
             }
-
+            
             let mut result : PrayerData = PrayerData { island_index: (0), day: (0), fajr: (0), sun: (0), dhuhur: (0), asr: (0), magrib: (0), isha: (0) };
-
+            
             result.island_set_from_vec(columns.iter().map(|x| x.parse::<i32>().unwrap()).collect());
             full_list.append(&mut vec![result]);
-
+            
         }
-    
+        
         full_list
-
+        
     }
+    
+}
+
+
+fn handle_args(args: Vec<String>){
+
+    let help_message:String = 
+"SalatMV for cli
+
+Usage: pt [option]
+
+Options:
+    -h, --help       shows this help section
+    -o, --output     just outputs data (this is done by default)
+    -r               outputs raw data in hours and minutes
+    -R               outputs raw data in minutes
+    -H  --hour       show time in 24 hour format
+    -t, --tui        opens in tui mode
+    -e, --edit       edit island index
+
+config contains island index
+config is stored in ~/.config/salat_mv/"
+.to_string();
+    let mut time_format = TimeFormat::Twelve;
+    
+    for arg in args{
+        
+        if arg == "-h" || arg == "--help" {
+            println!("{}",help_message);
+            return;
+        }
+        else if arg == "-H" || arg == "--hour" {
+            time_format = TimeFormat::TwentyFour;
+        }
+        else if arg == "-o" || arg == "--output" {
+            handle_prayer_data(Format::Normal, time_format);
+            return;
+        }
+        else if arg == "-r" {
+            handle_prayer_data(Format::RawData, time_format);
+            return;
+        }
+        else if arg == "-R" {
+            handle_prayer_data(Format::RawMinuteData, time_format);
+            return;
+        }
+         else if arg == "-t" || arg == "--tui" {
+            tui();
+            return;
+        }       
+         else if arg == "-e" || arg == "--edit" {
+            println!("select number");
+            return;
+        }
+    }
+    println!("invalid option entred");
+    
+
+}
+
+enum  Format {Normal,RawData, RawMinuteData}
+enum TimeFormat {TwentyFour,Twelve}
+
+fn handle_prayer_data(output_format: Format, time_format:TimeFormat){
+    
+    let backup_data:String = fs::read_to_string("/home/renderinguser/QuickAccess/Projects/codestuffz/Rust/SalatMV/src/ptdata.csv")
+        .expect("READ THE data.txt FILE DAMMIT");
+       
+    let data:String = fs::read_to_string("./ptdata.csv").unwrap_or(backup_data);
+       
+    let prayer_data : Vec<PrayerData> = data.parse_for_island(77);
+    // let prayer_data :Vec<PrayerData> = parse_text_for_island(data,77);
+    
+    let today :usize = chrono::offset::Local::now().ordinal() as usize;
+     
+    
+    prayer_data[today].print_data();
+    
+}
+
+fn tui(){
+    
 }
 
 fn main() -> Result<(), Error> {
-    let args : Vec<String> = env::args().collect();
-    println!("{:?}",args);
 
-    let backup_data:String = fs::read_to_string("/home/renderinguser/QuickAccess/Projects/codestuffz/Rust/SalatMV/src/ptdata.csv")
-        .expect("READ THE data.txt FILE DAMMIT");
-
-    let data:String = fs::read_to_string("./ptdata.csv").unwrap_or(backup_data);
-
-    let prayer_data : Vec<PrayerData> = data.parse_for_island(77);
-    // let prayer_data :Vec<PrayerData> = parse_text_for_island(data,77);
-
-    let today :usize = chrono::offset::Local::now().ordinal() as usize;
-
+    let mut args : Vec<String> = env::args().collect();
+    args.reverse();
+    args.pop();
+    args.reverse();
     
-    prayer_data[today].print_data();
-
+    if !args.is_empty(){
+        handle_args(args);
+    }else{
+        handle_prayer_data(Format::Normal, TimeFormat::Twelve);
+    }
     
-
+    
+    
     Ok(())
 }
