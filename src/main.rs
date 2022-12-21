@@ -157,8 +157,8 @@ Options:
     -r               outputs raw data in hours and minutes
     -R               outputs raw data in minutes
     -H  --hour       show time in 24 hour format
-    -t, --tui        opens in tui mode
-    -e, --edit       edit island index
+    -t, --tui        opens in tui mode (not implemented yet)
+    -e, --edit       edit island index (not implemented yet)
 
 config contains island index
 config is stored in ~/.config/salat_mv/"
