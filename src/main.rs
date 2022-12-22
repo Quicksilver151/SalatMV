@@ -99,9 +99,13 @@ impl TimeConversion for i32{
         let mut full_time_string = "".to_owned();
         let mut time = "";
         
+        
         match time_format{
             TimeType::TWHour => {
                 time = "am";
+                if hour == 12{
+                    time = "pm";
+                }
                 if hour > 12{
                     hour -= 12;
                     time = "pm";
