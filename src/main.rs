@@ -1,8 +1,15 @@
-use std::{io::Error, env};
-use std::fs;
+use std::{io::Error, env::{self, current_exe}, fs};
 use chrono::prelude::*;
+use serde::{Serialize, Deserialize, de};
+use flag_parser::{Flag,DispType,OutType,TimeType};
+mod flag_parser;
 
+#[derive(Default, Debug, Serialize, Deserialize)]
+struct Config{
+    island_index:i32
+}
 
+#[derive(Debug, Serialize, Deserialize)]
 struct PrayerData{
     island_index:i32,
     day: i32,
@@ -25,7 +32,21 @@ impl PrayerData{
         self.magrib = val[6];
         self.isha   = val[7];
     }
-    
+    fn vec_from_island_set(&self) -> Vec<i32>{
+        let mut val = vec![0;8];
+        val[0] = self.island_index;
+        val[1] = self.day;
+        val[2] = self.fajr;
+        val[3] = self.sun;
+        val[4] = self.dhuhur;
+        val[5] = self.asr;
+        val[6] = self.magrib;
+        val[7] = self.isha;
+        
+        val
+        
+    }
+            
     fn print_data(&self,time_format:TimeFormat){
         println!("Fajr:\t{}\nShuruq:\t{}\nDhuhur:\t{}\nAsr:\t{}\nMagrib:\t{}\nIsha:\t{}",
                 self.fajr   .minutes_to_time(&time_format),
@@ -71,6 +92,7 @@ trait TimeConversion{
 
 impl TimeConversion for i32{
     fn minutes_to_time(self,time_format:&TimeFormat)-> String{
+        
         let minute = &self%60;
         let mut hour = self/60;
         let mut full_time_string = "".to_owned();
@@ -192,16 +214,15 @@ config is stored in ~/.config/salat_mv/"
         }
     }
     
-    handle_prayer_data(format,time_format);
-
-    
+    handle_prayerdata(format,time_format);
+ 
 
 }
 
 enum  Format {Normal,RawData, RawMinuteData}
 enum TimeFormat {TwentyFour,Twelve}
 
-fn handle_prayer_data(output_format: Format, time_format:TimeFormat){
+fn handle_prayerdata(output_format: Format, time_format:TimeFormat){
     
     // gets data from file
     let backup_data:String = fs::read_to_string("/home/renderinguser/QuickAccess/Projects/codestuffz/Rust/SalatMV/src/ptdata.csv")
@@ -209,7 +230,6 @@ fn handle_prayer_data(output_format: Format, time_format:TimeFormat){
     
     let data:String = fs::read_to_string("./ptdata.csv").unwrap_or(backup_data);
     
-    //TODO: get data from config
     
     
     // parse data for selected island
@@ -226,22 +246,97 @@ fn handle_prayer_data(output_format: Format, time_format:TimeFormat){
     
 }
 
+// TODO::::::::::::::::::;
 fn tui(){
     
 }
 
+fn handle_prayer_data(flag:Flag, cfg:Config){
+    
+    let help_text:String = 
+"SalatMV for cli
+
+Usage: salat_mv [option]
+
+Options:
+    -h, --help       shows this help section
+    -t, --tui        opens in tui mode (not implemented yet)
+    -e, --edit       edit island index (not implemented yet)
+    -r  --raw-data   outputs raw data in hours and minutes
+    -m  --minutes    outputs raw data in minutes
+    -H  --hour       show time in 24 hour format
+
+config contains island index
+config is stored in ~/.config/salat_mv/"
+.to_string();
+
+    // data path
+    let mut data_path : String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+    data_path.push_str("/ptdata.csv");
+    
+    // gets data from file
+    let data : String = fs::read_to_string(data_path)
+        .expect("READ THE data.txt FILE DAMMIT");
+    
+    
+    let prayer_data : Vec<PrayerData> = data.parse_for_island(cfg.island_index);
+    
+    let today : usize = chrono::offset::Local::now().ordinal() as usize;
+    
+    // println!("{:?}{:?}", &prayer_data[today],cfg);
+    
+    let mut new_vec = prayer_data[today].vec_from_island_set();
+    new_vec.reverse();
+    new_vec.pop();
+    new_vec.reverse();
+
+    let neeew :Vec<String> = new_vec.iter().map(|x| x.minutes_to_time(&TimeFormat::Twelve)).collect();
+    
+    println!("{:?}",neeew);
+    
+    
+    
+    
+}
+
+
 fn main() -> Result<(), Error> {
 
-    let mut args : Vec<String> = env::args().collect();
-    args.reverse();
-    args.pop();
-    args.reverse();
+    // load config
+    let mut cfg: Config = confy::load("salat_mv", None).unwrap();
     
-    if !args.is_empty(){
-        handle_args(args);
-    }else{
-        handle_prayer_data(Format::Normal, TimeFormat::Twelve);
+    // fetch flags
+    let args : Vec<String> = env::args().collect();
+    let flag: Flag = flag_parser::parse_args(args).unwrap();
+    
+    // autocorrect config
+    if cfg.island_index < 41 && cfg.island_index > 82{
+        cfg.island_index = 42;
+        confy::store("salat_mv",None, &cfg).unwrap();
     }
+    
+    
+    // main logic
+    handle_prayer_data(flag, cfg);
+    
+    
+    
+    
+    
+    
+    
+    
+    // println!("{:?}", cfg);
+    
+    // args.reverse();
+    // args.pop();
+    // args.reverse();
+    // 
+    // if !args.is_empty(){
+    //     handle_args(args);
+    // }else{
+    //     handle_prayer_data(Format::Normal, TimeFormat::Twelve);
+    // }
     
     
     
