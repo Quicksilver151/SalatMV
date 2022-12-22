@@ -51,7 +51,9 @@ pub fn parse_args(mut args : Vec<String> ) -> Result<Flag, Flag>{
     for arg in args{
         
         let arg_vec : Vec<char> = arg.chars().collect::<Vec<char>>();
-        if arg_vec[0] == '-' && arg_vec[1] == '-'{
+        if arg_vec.len() == 1{println!("===INVALID FLAG ENTERED===\n\n{}",HELP_TEXT);return Err(flag)}
+        
+        else if arg_vec[0] == '-' && arg_vec[1] == '-'{
             
             let argument = arg.strip_prefix("--").unwrap();
             println!("{}",argument);
