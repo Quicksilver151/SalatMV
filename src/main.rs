@@ -1,7 +1,8 @@
-use std::{io::Error, env::{self, current_exe}, fs};
+use std::{env::{self, current_exe}, fs, iter::Enumerate};
 use chrono::prelude::*;
-use serde::{Serialize, Deserialize, de};
-use flag_parser::{Flag,DispType,OutType,TimeType};
+use serde::{Serialize, Deserialize};
+use flag_parser::*;
+
 mod flag_parser;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
@@ -47,29 +48,29 @@ impl PrayerData{
         
     }
             
-    fn print_data(&self,time_format:TimeFormat){
-        println!("Fajr:\t{}\nShuruq:\t{}\nDhuhur:\t{}\nAsr:\t{}\nMagrib:\t{}\nIsha:\t{}",
-                self.fajr   .minutes_to_time(&time_format),
-                self.sun    .minutes_to_time(&time_format),
-                self.dhuhur .minutes_to_time(&time_format),
-                self.asr    .minutes_to_time(&time_format),
-                self.magrib .minutes_to_time(&time_format),
-                self.isha   .minutes_to_time(&time_format)
-                )
-        
-    }
-        
-    fn print_data_as_hours_and_minutes(&self, time_format:TimeFormat){
-        println!("{}\n{}\n{}\n{}\n{}\n{}",
-                self.fajr   .minutes_to_time(&time_format),
-                self.sun    .minutes_to_time(&time_format),
-                self.dhuhur .minutes_to_time(&time_format),
-                self.asr    .minutes_to_time(&time_format),
-                self.magrib .minutes_to_time(&time_format),
-                self.isha   .minutes_to_time(&time_format)
-        )
-        
-    }
+    // fn print_data(&self,time_format:TimeFormat){
+    //     println!("Fajr:\t{}\nShuruq:\t{}\nDhuhur:\t{}\nAsr:\t{}\nMagrib:\t{}\nIsha:\t{}",
+    //             self.fajr   .minutes_to_time(&time_format),
+    //             self.sun    .minutes_to_time(&time_format),
+    //             self.dhuhur .minutes_to_time(&time_format),
+    //             self.asr    .minutes_to_time(&time_format),
+    //             self.magrib .minutes_to_time(&time_format),
+    //             self.isha   .minutes_to_time(&time_format)
+    //             )
+    //     
+    // }
+    //     
+    // fn print_data_as_hours_and_minutes(&self, time_format:TimeFormat){
+    //     println!("{}\n{}\n{}\n{}\n{}\n{}",
+    //             self.fajr   .minutes_to_time(&time_format),
+    //             self.sun    .minutes_to_time(&time_format),
+    //             self.dhuhur .minutes_to_time(&time_format),
+    //             self.asr    .minutes_to_time(&time_format),
+    //             self.magrib .minutes_to_time(&time_format),
+    //             self.isha   .minutes_to_time(&time_format)
+    //     )
+    //     
+    // }
 
     fn print_data_as_minutes(&self){
         println!("{}\n{}\n{}\n{}\n{}\n{}",
@@ -87,11 +88,11 @@ impl PrayerData{
 
 
 trait TimeConversion{
-    fn minutes_to_time(self,time_format:&TimeFormat) -> String;
+    fn minutes_to_time(self,time_format:&TimeType) -> String;
 }
 
 impl TimeConversion for i32{
-    fn minutes_to_time(self,time_format:&TimeFormat)-> String{
+    fn minutes_to_time(self,time_format:&TimeType)-> String{
         
         let minute = &self%60;
         let mut hour = self/60;
@@ -99,7 +100,7 @@ impl TimeConversion for i32{
         let mut time = "";
         
         match time_format{
-            TimeFormat::Twelve => {
+            TimeType::TWHour => {
                 time = "am";
                 if hour > 12{
                     hour -= 12;
@@ -107,7 +108,7 @@ impl TimeConversion for i32{
                 }
             }
             
-            TimeFormat::TwentyFour => {}
+            TimeType::TFHour => {}
         }
         
         
@@ -238,11 +239,11 @@ fn handle_prayerdata(output_format: Format, time_format:TimeFormat){
     
     let today :usize = chrono::offset::Local::now().ordinal() as usize;
     
-    match output_format{
-        Format::Normal => prayer_data[today].print_data(time_format),
-        Format::RawData => prayer_data[today].print_data_as_hours_and_minutes(time_format),
-        Format::RawMinuteData => prayer_data[today].print_data_as_minutes(),
-    };
+    // match output_format{
+    //     Format::Normal => prayer_data[today].print_data(time_format),
+    //     Format::RawData => prayer_data[today].print_data_as_hours_and_minutes(time_format),
+    //     Format::RawMinuteData => prayer_data[today].print_data_as_minutes(),
+    // };
     
 }
 
@@ -253,22 +254,7 @@ fn tui(){
 
 fn handle_prayer_data(flag:Flag, cfg:Config){
     
-    let help_text:String = 
-"SalatMV for cli
-
-Usage: salat_mv [option]
-
-Options:
-    -h, --help       shows this help section
-    -t, --tui        opens in tui mode (not implemented yet)
-    -e, --edit       edit island index (not implemented yet)
-    -r  --raw-data   outputs raw data in hours and minutes
-    -m  --minutes    outputs raw data in minutes
-    -H  --hour       show time in 24 hour format
-
-config contains island index
-config is stored in ~/.config/salat_mv/"
-.to_string();
+    
 
     // data path
     let mut data_path : String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
@@ -285,14 +271,27 @@ config is stored in ~/.config/salat_mv/"
     
     // println!("{:?}{:?}", &prayer_data[today],cfg);
     
-    let mut new_vec = prayer_data[today].vec_from_island_set();
-    new_vec.reverse();
-    new_vec.pop();
-    new_vec.reverse();
+    let mut pt_vec = prayer_data[today].vec_from_island_set();
+    pt_vec.reverse();
+    pt_vec.pop();
+    pt_vec.pop();
+    pt_vec.reverse();
 
-    let neeew :Vec<String> = new_vec.iter().map(|x| x.minutes_to_time(&TimeFormat::Twelve)).collect();
-    
-    println!("{:?}",neeew);
+    // let neeew :Vec<String> = new_vec.iter().map(|x| x.minutes_to_time(&TimeFormat::Twelve)).collect();
+    let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
+
+    for (i,pt) in pt_vec.iter().enumerate(){
+        match flag.disp{
+            DispType::Normal => print!("{}:\t",names[i]),
+            DispType::Raw    => print!("{}",i),
+        }
+        match flag.output{
+            OutType::Hours   => println!("{}",pt.minutes_to_time(&flag.time)),
+            OutType::Minutes => println!("{}",pt),
+        }
+        
+    }
+    // println!("{:?}",neeew);
     
     
     
@@ -300,14 +299,17 @@ config is stored in ~/.config/salat_mv/"
 }
 
 
-fn main() -> Result<(), Error> {
+fn main(){
 
     // load config
     let mut cfg: Config = confy::load("salat_mv", None).unwrap();
     
     // fetch flags
     let args : Vec<String> = env::args().collect();
-    let flag: Flag = flag_parser::parse_args(args).unwrap();
+    let flag: Flag = match flag_parser::parse_args(args){
+        Ok(flag) => flag,
+        Err(_flag) => return,
+    };
     
     // autocorrect config
     if cfg.island_index < 41 && cfg.island_index > 82{
@@ -316,11 +318,17 @@ fn main() -> Result<(), Error> {
     }
     
     
+
+    
+    
     // main logic
+    if flag.help{
+        println!("{}",HELP_TEXT);
+        return;
+    }
+    
+    
     handle_prayer_data(flag, cfg);
-    
-    
-    
     
     
     
@@ -340,5 +348,4 @@ fn main() -> Result<(), Error> {
     
     
     
-    Ok(())
 }
