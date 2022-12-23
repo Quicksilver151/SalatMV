@@ -138,6 +138,10 @@ fn tui(){
     println!("feature not implemented ([yet]->i hope)");
 }
 
+fn edit(){
+
+}
+
 fn handle_prayer_data(flag: Flag, cfg: Config){
     
     // data path
@@ -165,6 +169,10 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
     for (i,pt) in pt_vec.iter().enumerate(){
         if flag.tui{
             tui();
+            break;
+        }
+        if flag.edit{
+            edit();
             break;
         }
         match flag.disp{
