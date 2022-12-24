@@ -180,11 +180,34 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
             DispType::Raw    => print!(""),
         }
         match flag.output{
-            OutType::Hours   => println!("{}",pt.minutes_to_time(&flag.time)),
-            OutType::Minutes => println!("{}",pt),
+            OutType::Hours   => print!("{}",pt.minutes_to_time(&flag.time)),
+            OutType::Minutes => print!("{}",pt),
+        }
+        if flag.current{
+            let current_time = chrono::offset::Local::now();
+            let time_minutes = (current_time.hour() * 60 + current_time.minute()) as i32;
+
+            let prev_diff = {if i > 0{pt_vec[i-1]-time_minutes}else{pt_vec[5]-time_minutes}};
+            let diff = pt-time_minutes;
+            let next_diff = {if i < 5{pt_vec[i+1]-time_minutes}else{pt_vec[0]-time_minutes}};
+            
+            // print!("\t{},\t{},\t{}",prev_diff,diff,next_diff);
+            if diff.is_negative() && next_diff.is_positive(){
+                print!(" /------");
+            }
+            if prev_diff.is_negative() && diff.is_positive(){
+                print!(" \\------");
+            }
+            if pt_vec[0] > time_minutes || pt_vec[5] < time_minutes{
+                if pt == &pt_vec[5]{print!(" /------")}
+                if pt == &pt_vec[0]{print!(" \\------")}
+            }
+            
         }
         
-    }
+        println!();
+        
+    };
 }
 
 
