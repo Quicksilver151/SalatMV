@@ -186,7 +186,7 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         if flag.current{
             let current_time = chrono::offset::Local::now();
             let time_minutes = (current_time.hour() * 60 + current_time.minute()) as i32;
-
+            
             let prev_diff = {if i > 0{pt_vec[i-1]-time_minutes}else{pt_vec[5]-time_minutes}};
             let diff = pt-time_minutes;
             let next_diff = {if i < 5{pt_vec[i+1]-time_minutes}else{pt_vec[0]-time_minutes}};
