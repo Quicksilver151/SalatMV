@@ -163,9 +163,17 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
     pt_vec.pop();
     pt_vec.pop();
     pt_vec.reverse();
-    
+   
+    // some temporary inits
     let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
-    
+    let time_minutes = get_current_time_in_minutes();
+
+    if flag.disp == DispType::Normal{
+        println!("\tSalat_MV-cli\n\t============");
+        println!("current time :{}", time_minutes.minutes_to_time(&flag.time));
+        println!("island name  :[]");
+        println!();
+    }
     for (i,pt) in pt_vec.iter().enumerate(){
         if flag.tui{
             tui();
@@ -175,7 +183,8 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
             edit();
             break;
         }
-        match flag.disp{
+        match flag.disp{// only numbers or with info
+            
             DispType::Normal => print!("{}:\t",names[i]),
             DispType::Raw    => print!(""),
         }
@@ -184,9 +193,7 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
             OutType::Minutes => print!("{}",pt),
         }
         if flag.current{
-            let current_time = chrono::offset::Local::now();
-            let time_minutes = (current_time.hour() * 60 + current_time.minute()) as i32;
-            
+            let time_minutes = get_current_time_in_minutes();
             let prev_diff = {if i > 0{pt_vec[i-1]-time_minutes}else{pt_vec[5]-time_minutes}};
             let diff = pt-time_minutes;
             let next_diff = {if i < 5{pt_vec[i+1]-time_minutes}else{pt_vec[0]-time_minutes}};
@@ -241,3 +248,13 @@ fn main(){
     
     
 }
+
+
+
+fn get_current_time_in_minutes() -> i32 {
+    let current_time = chrono::offset::Local::now();
+    let time_minutes = (current_time.hour() * 60 + current_time.minute()) as i32;
+    time_minutes
+}
+
+

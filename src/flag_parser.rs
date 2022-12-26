@@ -1,12 +1,12 @@
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum DispType {Normal,     Raw}
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum OutType  {Hours , Minutes}
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TimeType {TWHour,  TFHour}
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Flag{
     pub help    : bool,
     pub tui     : bool,
