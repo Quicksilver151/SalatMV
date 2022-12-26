@@ -1,9 +1,10 @@
 use std::{env::{self, current_exe}, fs};
 use chrono::prelude::*;
 use serde::{Serialize, Deserialize};
-use flag_parser::*;
 
 mod flag_parser;
+use flag_parser::*;
+
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 struct Config{
@@ -104,15 +105,16 @@ trait PTDataParse {
 impl PTDataParse for String{
     fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>{
         
-        
+        // split by line for each valid data
         let mut grouped :Vec<&str> = self.split('\n').collect();
-        grouped.pop();
+        grouped.pop(); // remove last line
         grouped.reverse();
-        grouped.pop();
+        grouped.pop(); // remove first line
         grouped.reverse();
         
         let mut full_list: Vec<PrayerData> = vec![];
         
+        // split by column for each valid data
         for group in grouped{
             let columns: Vec<&str> = group.split(';').collect();
             
@@ -135,11 +137,13 @@ impl PTDataParse for String{
 
 // TODO::::::::::::::::::;
 fn tui(){
-    println!("feature not implemented ([yet]->i hope)");
+    println!("tui: feature not implemented ([yet]->i hope)");
+    // WIP
 }
 
 fn edit(){
-
+    println!("edit: feature not implemented ([yet]->i hope)");
+    // same here
 }
 
 fn handle_prayer_data(flag: Flag, cfg: Config){
@@ -167,11 +171,12 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
     // some temporary inits
     let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
     let time_minutes = get_current_time_in_minutes();
-
+    
+    // optional header
     if flag.disp == DispType::Normal{
         println!("\tSalat_MV-cli\n\t============");
         println!("current time :{}", time_minutes.minutes_to_time(&flag.time));
-        println!("island name  :[]");
+        println!("island name  :[WIP]");
         println!();
     }
     for (i,pt) in pt_vec.iter().enumerate(){
@@ -183,7 +188,7 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
             edit();
             break;
         }
-        match flag.disp{// only numbers or with info
+        match flag.disp{ // only numbers or with info
             
             DispType::Normal => print!("{}:\t",names[i]),
             DispType::Raw    => print!(""),
@@ -230,7 +235,7 @@ fn main(){
         Err(_flag) => return,
     };
     
-    // autocorrect config
+    // autocorrect config that is out of bounds
     if cfg.island_index < 41 && cfg.island_index > 82{
         cfg.island_index = 42;
         confy::store("salat_mv",None, &cfg).unwrap();
@@ -238,23 +243,23 @@ fn main(){
     
      
     // main logic
-    if flag.help{
+    // ==========
+    
+    if flag.help{ // breakout for help
         println!("{}",HELP_TEXT);
         return;
     }
     
     
-    handle_prayer_data(flag, cfg);
-    
+    handle_prayer_data(flag, cfg); // run main thing
     
 }
 
 
-
+// smol functions
 fn get_current_time_in_minutes() -> i32 {
     let current_time = chrono::offset::Local::now();
-    let time_minutes = (current_time.hour() * 60 + current_time.minute()) as i32;
-    time_minutes
+    (current_time.hour() * 60 + current_time.minute()) as i32
 }
 
 
