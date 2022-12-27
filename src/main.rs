@@ -8,7 +8,8 @@ use flag_parser::*;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 struct Config{
-    island_index:i32
+    island_index:i32,
+    island_name:String,
 }
 
 struct PrayerData{
@@ -133,6 +134,13 @@ impl PTDataParse for String{
     }
 }
 
+fn get_atoll_data(){
+
+}
+
+fn get_island_data(){
+
+}
 
 
 // TODO::::::::::::::::::;
@@ -170,15 +178,17 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
    
     // some temporary inits
     let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
-    let time_minutes = get_current_time_in_minutes();
+    // let time_minutes = get_current_time_in_minutes();
     
     // optional header
-    if flag.disp == DispType::Normal{
-        println!("\tSalat_MV-cli\n\t============");
-        println!("current time :{}", time_minutes.minutes_to_time(&flag.time));
-        println!("island name  :[WIP]");
-        println!();
-    }
+    // if flag.disp == DispType::Normal{
+    //     println!("Salat_MV-cli");
+    //     println!("---------------------");
+    //     println!("Time   :  {}", time_minutes.minutes_to_time(&flag.time));
+    //     println!("Island :  {}",cfg.island_name);
+    //     println!("---------------------");
+    //     println!();
+    // }
     for (i,pt) in pt_vec.iter().enumerate(){
         if flag.tui{
             tui();
@@ -222,24 +232,35 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
     };
 }
 
-
 fn main(){
     
     // load config
-    let mut cfg: Config = confy::load("salat_mv", None).unwrap();
+    //
+    let cfg_result : Result<Config,confy::ConfyError> = confy::load("salat_mv", None);
+    let mut cfg = match cfg_result{
+        Ok(cfg_result)  => cfg_result,
+        Err(_cfg_result) => {
+            println!("Warning: config was broken so it has been autofixed");
+            Config { island_index: 41, island_name: "Male'".to_string() } 
+        },
+    };
     
+    
+    // autocorrect config that is out of bounds
+    if cfg.island_index < 41 || cfg.island_index > 82{
+        println!("Warning: config was incorrect so it has been reset");
+        cfg.island_index = 42;
+        cfg.island_name = "Male'".to_string();
+    }
+    
+    confy::store("salat_mv",None, &cfg).unwrap();
+
     // fetch flags
     let args : Vec<String> = env::args().collect();
     let flag: Flag = match flag_parser::parse_args(args){
         Ok(flag) => flag,
         Err(_flag) => return,
     };
-    
-    // autocorrect config that is out of bounds
-    if cfg.island_index < 41 && cfg.island_index > 82{
-        cfg.island_index = 42;
-        confy::store("salat_mv",None, &cfg).unwrap();
-    }
     
      
     // main logic
