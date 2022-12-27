@@ -135,11 +135,11 @@ impl PTDataParse for String{
 }
 
 fn get_atoll_data(){
-
+    
 }
 
 fn get_island_data(){
-
+    
 }
 
 
@@ -175,20 +175,21 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
     pt_vec.pop();
     pt_vec.pop();
     pt_vec.reverse();
-   
+    
     // some temporary inits
     let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
-    // let time_minutes = get_current_time_in_minutes();
     
-    // optional header
-    // if flag.disp == DispType::Normal{
-    //     println!("Salat_MV-cli");
-    //     println!("---------------------");
-    //     println!("Time   :  {}", time_minutes.minutes_to_time(&flag.time));
-    //     println!("Island :  {}",cfg.island_name);
-    //     println!("---------------------");
-    //     println!();
-    // }
+    // optional title
+    if flag.disp == DispType::Normal && flag.title && !flag.tui && !flag.edit{
+        let time_minutes = get_current_time_in_minutes();
+        
+        println!("Salat_MV-cli");
+        println!("---------------------");
+        println!("Time   :  {}", time_minutes.minutes_to_time(&flag.time));
+        println!("Island :  {}",cfg.island_name);
+        println!("---------------------");
+        println!();
+    }
     for (i,pt) in pt_vec.iter().enumerate(){
         if flag.tui{
             tui();
