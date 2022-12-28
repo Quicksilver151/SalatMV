@@ -141,8 +141,8 @@ fn get_atoll_data(){
      // gets data from database
     let data : String = fs::read_to_string(data_path)
         .expect("READ THE data.txt FILE DAMMIT");
-
-    println!("{}",data);
+    
+    // println!("{}",data);
      
     
 }
@@ -155,7 +155,7 @@ fn get_island_data(){
     let data: String = fs::read_to_string(data_path)
         .expect("READ THE data.txt FILE DAMMIT");
     
-    println!("{}",data);
+    // println!("{}",data);
     
     
 }
