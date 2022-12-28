@@ -135,10 +135,28 @@ impl PTDataParse for String{
 }
 
 fn get_atoll_data(){
+    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+    data_path.push_str("/atolls.csv");
+    
+     // gets data from database
+    let data : String = fs::read_to_string(data_path)
+        .expect("READ THE data.txt FILE DAMMIT");
+
+    println!("{}",data);
+     
     
 }
 
 fn get_island_data(){
+    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+    data_path.push_str("/islands.csv");
+    
+     // gets data from database
+    let data: String = fs::read_to_string(data_path)
+        .expect("READ THE data.txt FILE DAMMIT");
+    
+    println!("{}",data);
+    
     
 }
 
@@ -155,7 +173,8 @@ fn edit(){
 }
 
 fn handle_prayer_data(flag: Flag, cfg: Config){
-    
+    get_atoll_data();
+    get_island_data();
     // data path
     let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
     data_path.push_str("/ptdata.csv");
