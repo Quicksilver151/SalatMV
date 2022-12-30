@@ -256,7 +256,7 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         println!("Salat_MV-cli");
         println!("---------------------");
         println!("Time   :  {}", time_minutes.minutes_to_time(&flag.time));
-        // println!("Island :  {}",cfg.island_name);
+        println!("Island :  {}",cfg.island_name);
         println!("---------------------");
         println!();
     }
