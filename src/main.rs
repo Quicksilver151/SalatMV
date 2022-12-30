@@ -8,7 +8,7 @@ use flag_parser::*;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 struct Config{
-    island_index:i32,
+    island_index: usize,
     island_name:String,
 }
 
@@ -22,6 +22,9 @@ struct PrayerData{
     magrib: i32,
     isha:   i32,
 }
+
+
+
 
 impl PrayerData{
     fn island_set_from_vec(&mut self, val: Vec<i32>){
@@ -105,7 +108,6 @@ trait PTDataParse {
 
 impl PTDataParse for String{
     fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>{
-        
         // split by line for each valid data
         let mut grouped :Vec<&str> = self.split('\n').collect();
         grouped.pop(); // remove last line
@@ -134,31 +136,41 @@ impl PTDataParse for String{
     }
 }
 
-fn get_atoll_data(){
+fn get_data_from_file(path:&str) -> Vec<String>{
     let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
-    data_path.push_str("/atolls.csv");
+    data_path.push_str(path);
     
      // gets data from database
     let data : String = fs::read_to_string(data_path)
         .expect("READ THE data.txt FILE DAMMIT");
     
-    // println!("{}",data);
-     
+    let mut grouped : Vec<&str> = data.split('\n').collect();
+    grouped.pop();
+    
+    grouped.iter().map(|x| x.parse::<String>().unwrap()).collect()
+    // new
     
 }
 
-fn get_island_data(){
-    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
-    data_path.push_str("/islands.csv");
-    
-     // gets data from database
-    let data: String = fs::read_to_string(data_path)
-        .expect("READ THE data.txt FILE DAMMIT");
-    
-    // println!("{}",data);
-    
-    
-}
+// fn get_island_data() -> Vec<String>{
+//     let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+//     data_path.push_str("/islands.csv");
+//     
+//      // gets data from database
+//     let data: String = fs::read_to_string(data_path)
+//         .expect("READ THE data.txt FILE DAMMIT");
+//     
+//     let mut grouped :Vec<&str> = data.split('\n').collect();
+//     grouped.pop();
+//     
+//     
+//     // to String
+//     grouped.iter().map(|x| x.parse::<String>().unwrap()).collect()
+//      
+//     // println!("{}",data);
+//     
+//     
+// }
 
 
 // TODO::::::::::::::::::;
@@ -168,23 +180,62 @@ fn tui(){
 }
 
 fn edit(){
-    println!("edit: feature not implemented ([yet]->i hope)");
+    
+    println!("EDIT MODE\n changes are made to the config file\n");
+
+    let raw_atoll_data : Vec<String> = get_data_from_file( "/atolls.csv");
+    let raw_island_data: Vec<String> = get_data_from_file("/islands.csv");
+    
+    // only [row][column:  0,1,2] useful (0 = atoll_index, 1=name, 2=dhi_name)
+    let atoll_data : Vec<Vec<&str>> = raw_atoll_data .iter().map(|x| x.split(';').collect()).collect();
+    
+    // only [row][coloumn: 0,2,3] useful (0 = time index, 2=atoll, 3=name, 4=dhi_name)
+    let island_data: Vec<Vec<&str>> = raw_island_data.iter().map(|x| x.split(';').collect()).collect();
+    
+    
+    // print atoll list
+    clear_screen();
+    println!("Index\tName\tDhiName");
+    println!("-----\t----\t-------");
+    atoll_data .iter().for_each(|x| println!("{}\t{}\t{}",x[0],x[1],x[2]));
+    println!("Input a number from the first colum to select Atoll:");
+    let selected_atoll_index:  usize = get_number_input().expect("Must be a non zero positive integer");
+    if selected_atoll_index < 1 || selected_atoll_index > 20 {
+        panic!("value not within range");
+    }
+    
+    // print island list for selected atoll
+    clear_screen();
+    println!("Index\tIsland Name\tDhi Name");
+    println!("-----\t-----------\t--------");
+    island_data.iter().for_each(|x| {if x[2].parse::<usize>().unwrap() == selected_atoll_index { println!("{}\t{}\t{}",x[0],x[3],x[4])}});
+    println!("Input a number from the first column to select prefered timeset:");
+    let selected_time_index: usize =  get_number_input().unwrap();
+    
+    println!("Timeset {} selected",selected_time_index);
+    
+    let new_cfg = Config{island_index:selected_time_index, island_name:"WIP".to_string()};
+    
+    confy::store("salat_mv",None, &new_cfg).unwrap();
+    
+    // println!("{}\n\n{}",atoll_data[3][0],island_data[2][3]);
+    
+    
+    // println!("edit: feature not implemented ([yet]->i hope)");
     // same here
 }
 
 fn handle_prayer_data(flag: Flag, cfg: Config){
-    get_atoll_data();
-    get_island_data();
-    // data path
+        // data path
     let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
     data_path.push_str("/ptdata.csv");
     
     // gets data from database
-    let data: String = fs::read_to_string(data_path)
+    let raw_prayer_data: String = fs::read_to_string(data_path)
         .expect("READ THE data.txt FILE DAMMIT");
     
     
-    let prayer_data : Vec<PrayerData> = data.parse_for_island(cfg.island_index);
+    let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
     
     let today: usize = chrono::offset::Local::now().ordinal() as usize;
     
@@ -205,7 +256,7 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         println!("Salat_MV-cli");
         println!("---------------------");
         println!("Time   :  {}", time_minutes.minutes_to_time(&flag.time));
-        println!("Island :  {}",cfg.island_name);
+        // println!("Island :  {}",cfg.island_name);
         println!("---------------------");
         println!();
     }
@@ -261,7 +312,7 @@ fn main(){
         Ok(cfg_result)  => cfg_result,
         Err(_cfg_result) => {
             println!("Warning: config was broken so it has been autofixed");
-            Config { island_index: 41, island_name: "Male'".to_string() } 
+            Config { island_index: 57, island_name: "Male'".to_string() } 
         },
     };
     
@@ -274,7 +325,7 @@ fn main(){
     }
     
     confy::store("salat_mv",None, &cfg).unwrap();
-
+    
     // fetch flags
     let args : Vec<String> = env::args().collect();
     let flag: Flag = match flag_parser::parse_args(args){
@@ -303,4 +354,19 @@ fn get_current_time_in_minutes() -> i32 {
     (current_time.hour() * 60 + current_time.minute()) as i32
 }
 
+
+fn get_number_input() -> Result<usize,std::num::ParseIntError>{
+    let mut input_text = String::new();
+    std::io::stdin()
+        .read_line(&mut input_text)
+        .expect("failed to read from stdin");
+    
+    let trimmed = input_text.trim();
+    trimmed.parse::<usize>()   
+}
+
+
+fn clear_screen(){
+    println!("\n\n\n\n\n\n\n\n\n");
+}
 
