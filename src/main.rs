@@ -1,6 +1,7 @@
 use std::{env::{self, current_exe}, fs};
 use chrono::prelude::*;
 use serde::{Serialize, Deserialize};
+use std::process::Command;
 
 mod flag_parser;
 use flag_parser::*;
@@ -267,6 +268,10 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         }
         if flag.edit{
             edit();
+            break;
+        }
+        if flag.notify{
+            Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
             break;
         }
         match flag.disp{ // only numbers or with info
