@@ -181,9 +181,11 @@ fn tui(){
 }
 
 fn edit(){
-    
-    println!("EDIT MODE\n changes are made to the config file\n");
 
+    // start new session
+    println!("\x1b[?1049h");
+    println!("EDIT MODE\n changes are made to the config file\n");
+    
     let raw_atoll_data : Vec<String> = get_data_from_file( "/atolls.csv");
     let raw_island_data: Vec<String> = get_data_from_file("/islands.csv");
     
@@ -213,11 +215,15 @@ fn edit(){
     println!("Input a number from the first column to select prefered timeset:");
     let selected_time_index: usize =  get_number_input().unwrap();
     
-    println!("Timeset {} selected",selected_time_index);
     
     let new_cfg = Config{island_index:selected_time_index, island_name:"WIP".to_string()};
     
     confy::store("salat_mv",None, &new_cfg).unwrap();
+    
+    // exit new session
+    print!("\x1b[?1049l");
+    
+    println!("Timeset {} selected",selected_time_index);
     
     // println!("{}\n\n{}",atoll_data[3][0],island_data[2][3]);
     
@@ -272,6 +278,10 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         }
         if flag.notify{
             Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
+            // loop{
+            //     std::thread::sleep_ms(1000);
+            //     break;
+            // }
             break;
         }
         match flag.disp{ // only numbers or with info
@@ -372,6 +382,7 @@ fn get_number_input() -> Result<usize,std::num::ParseIntError>{
 
 
 fn clear_screen(){
-    println!("\n\n\n\n\n\n\n\n\n");
+    print!("\x1B[2J");
+    print!("\x1b[1;1H");
 }
 
