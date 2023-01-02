@@ -181,9 +181,9 @@ fn tui(){
 }
 
 fn edit(){
-
+    
     // start new session
-    println!("\x1b[?1049h");
+    print!("\x1b[?1049h");
     println!("EDIT MODE\n changes are made to the config file\n");
     
     let raw_atoll_data : Vec<String> = get_data_from_file( "/atolls.csv");
@@ -196,24 +196,45 @@ fn edit(){
     let island_data: Vec<Vec<&str>> = raw_island_data.iter().map(|x| x.split(';').collect()).collect();
     
     
-    // print atoll list
     clear_screen();
+    // print atoll list
     println!("Index\tName\tDhiName");
     println!("-----\t----\t-------");
     atoll_data .iter().for_each(|x| println!("{}\t{}\t{}",x[0],x[1],x[2]));
-    println!("Input a number from the first colum to select Atoll:");
-    let selected_atoll_index:  usize = get_number_input().expect("Must be a non zero positive integer");
-    if selected_atoll_index < 1 || selected_atoll_index > 20 {
+    println!("Input a number from the first colum to select Atoll(1 to 20) or select a timeset(41 to 82):");
+    let selected_atoll_index: usize = get_number_input().expect("Must be a non zero positive integer");
+    let selected_time_index : usize;
+    
+    if std::ops::RangeInclusive::new(1, 20).contains(&selected_atoll_index){
+        clear_screen();
+        // print island list for selected atoll
+        println!("{0: <5} | {1: <7} | {2: <15} | {3: <10}","Index","Timeset","Island Name","Dhi Name");
+        println!("-------------------------------------------");
+        let mut i = 0;
+        let mut selectables: Vec<usize> = vec![];
+        for island in island_data.iter(){
+            
+            if island[2].parse::<usize>().unwrap_or(1) == selected_atoll_index{
+                i += 1;
+                selectables.append(&mut vec![island[0].parse::<usize>().unwrap_or(41)]);
+                println!("{0: <5} | {1: <7} | {2: <15} | {3: <10}",i,island[0],island[3],island[4]);
+            }
+        }
+        
+        println!("Input a number from the first column to select prefered timeset:");
+        selected_time_index =  selectables[get_number_input().unwrap()];
+        
+    }else if std::ops::RangeInclusive::new(41, 82).contains(&selected_atoll_index){
+        selected_time_index = selected_atoll_index;
+        
+    }else{
+        
+        println!("\x1b[?1049l");
+        
         panic!("value not within range");
     }
     
-    // print island list for selected atoll
-    clear_screen();
-    println!("Index\tIsland Name\tDhi Name");
-    println!("-----\t-----------\t--------");
-    island_data.iter().for_each(|x| {if x[2].parse::<usize>().unwrap() == selected_atoll_index { println!("{}\t{}\t{}",x[0],x[3],x[4])}});
-    println!("Input a number from the first column to select prefered timeset:");
-    let selected_time_index: usize =  get_number_input().unwrap();
+    
     
     
     let new_cfg = Config{island_index:selected_time_index, island_name:"WIP".to_string()};
@@ -244,8 +265,7 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
     
     let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
     
-    let today: usize = chrono::offset::Local::now().ordinal() as usize;
-    
+    let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
     
     let mut pt_vec = prayer_data[today].vec_from_island_set();
     pt_vec.reverse();
