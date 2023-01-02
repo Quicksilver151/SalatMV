@@ -287,6 +287,10 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         println!("---------------------");
         println!();
     }
+    // clear_screen();
+    let mut time_minutes = 0;
+    while  time_minutes < 1440{
+    std::thread::sleep_ms(5);
     for (i,pt) in pt_vec.iter().enumerate(){
         if flag.tui{
             tui();
@@ -314,28 +318,37 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
             OutType::Minutes => print!("{}",pt),
         }
         if flag.current{
-            let time_minutes = get_current_time_in_minutes();
+            // let time_minutes = get_current_time_in_minutes();
             let prev_diff = {if i > 0{pt_vec[i-1]-time_minutes}else{pt_vec[5]-time_minutes}};
             let diff = pt-time_minutes;
             let next_diff = {if i < 5{pt_vec[i+1]-time_minutes}else{pt_vec[0]-time_minutes}};
             
+            let tail_prev_len = "-".repeat(10.min(prev_diff.abs()/10) as usize);
+            let tail_next_len = "-".repeat(10.min(next_diff.abs()/10) as usize);
+            
             // print!("\t{},\t{},\t{}",prev_diff,diff,next_diff);
             if diff.is_negative() && next_diff.is_positive(){
-                print!(" /------");
+                print!(" /{}",tail_next_len);
             }
             if prev_diff.is_negative() && diff.is_positive(){
-                print!(" \\------");
+                print!(" \\{}",tail_prev_len);
             }
             if pt_vec[0] > time_minutes || pt_vec[5] < time_minutes{
-                if pt == &pt_vec[5]{print!(" /------")}
-                if pt == &pt_vec[0]{print!(" \\------")}
+                
+                if pt == &pt_vec[5]{print!(" /{}",tail_next_len)}
+                if pt == &pt_vec[0]{print!(" \\{}",tail_prev_len)}
             }
-            
+            if pt == &time_minutes{
+                print!(" <<------------");
+            }
         }
         
         println!();
         
     };
+    
+    time_minutes += 1;
+    }
 }
 
 fn main(){
@@ -405,4 +418,4 @@ fn clear_screen(){
     print!("\x1B[2J");
     print!("\x1b[1;1H");
 }
-
+// TODO CURRENT DOESNT WORK AT EXACT TIME
