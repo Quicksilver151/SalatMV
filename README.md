@@ -29,7 +29,9 @@ You can find the releases in the [releases](https://github.com/Quicksilver151/Sa
 
 ### Linux
 
-- install cargo on your system
+- install rust/cargo on your system
+- run `git tag -l` to get a list of tags
+- run `git checkout [version]` to checkout to the latest tag (regular commits are not stable)
 - run `build_for_linux.sh`
 - a file link should be available in ./target
 
