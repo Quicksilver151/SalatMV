@@ -61,7 +61,11 @@ you can combine multiple flags like `salat_mv -ctH`
 
 # Todo:
 
-- [ ] Tui mode
+### version 2.0.0
+
+- [ ] Tui mode 
+
+### version 1.0.0
 
 - [ ] Notifications via `notify-send`
 
