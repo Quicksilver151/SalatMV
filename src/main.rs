@@ -287,10 +287,13 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         println!("---------------------");
         println!();
     }
+    // Debug loop over each minute of the day
+    //----------------------------------
     // clear_screen();
-    let mut time_minutes = 0;
-    while  time_minutes < 1440{
-    std::thread::sleep_ms(5);
+    // let mut time_minutes = 0;
+    // while  time_minutes < 1440{
+    // std::thread::sleep_ms(5);
+    // --------------------------------
     for (i,pt) in pt_vec.iter().enumerate(){
         if flag.tui{
             tui();
@@ -318,7 +321,7 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
             OutType::Minutes => print!("{}",pt),
         }
         if flag.current{
-            // let time_minutes = get_current_time_in_minutes();
+            let time_minutes = get_current_time_in_minutes();
             let prev_diff = {if i > 0{pt_vec[i-1]-time_minutes}else{pt_vec[5]-time_minutes}};
             let diff = pt-time_minutes;
             let next_diff = {if i < 5{pt_vec[i+1]-time_minutes}else{pt_vec[0]-time_minutes}};
@@ -346,9 +349,10 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         println!();
         
     };
-    
-    time_minutes += 1;
-    }
+    //------------------
+    //time_minutes += 1;
+    //}
+    //-----------------
 }
 
 fn main(){
