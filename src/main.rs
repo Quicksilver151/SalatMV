@@ -331,10 +331,10 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
             
             // print!("\t{},\t{},\t{}",prev_diff,diff,next_diff);
             if diff.is_negative() && next_diff.is_positive(){
-                print!(" /---{}",tail_next_len);
+                print!(" /{}",tail_next_len);
             }
             if prev_diff.is_negative() && diff.is_positive(){
-                print!(" \\---{}",tail_prev_len);
+                print!(" \\{}",tail_prev_len);
             }
             if pt_vec[0] > time_minutes || pt_vec[5] < time_minutes{
                 
