@@ -71,8 +71,10 @@ you can combine multiple flags like `salat_mv -ctH`
 
 - [ ] Notifications via `notify-send`
 
+- [ ] 
+
 - [ ] Change edit mode to be more usable
 
-- [ ] More visual feedback for --current flag
+- [x] More visual feedback for --current flag
 
 - [x] config storage
