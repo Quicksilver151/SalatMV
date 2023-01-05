@@ -236,7 +236,6 @@ fn edit(){
     
     
     
-    
     let new_cfg = Config{island_index:selected_time_index, island_name:"WIP".to_string()};
     
     confy::store("salat_mv",None, &new_cfg).unwrap();
@@ -253,25 +252,39 @@ fn edit(){
     // same here
 }
 
-fn handle_prayer_data(flag: Flag, cfg: Config){
-        // data path
-    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
-    data_path.push_str("/ptdata.csv");
+
+fn notify(data: ProgramData){
+    print!("\x1b[?1049h");
     
-    // gets data from database
-    let raw_prayer_data: String = fs::read_to_string(data_path)
-        .expect("READ THE data.txt FILE DAMMIT");
+    loop{
+        
+        print_prayer_data(&data);
+        std::thread::sleep_ms(1000);
+        
+        
+        
+    }
+    // print!("\x1b[?1049l");
     
+}
+
+struct ProgramData{
+    flag: Flag,
+    cfg: Config,
+    pt_vec: Vec<i32>,
+}
+
+
+fn print_prayer_data(data: &ProgramData){
+    let (flag,cfg,pt_vec) = (data.flag,data.cfg,data.pt_vec);
     
-    let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
-    
-    let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
-    
-    let mut pt_vec = prayer_data[today].vec_from_island_set();
-    pt_vec.reverse();
-    pt_vec.pop();
-    pt_vec.pop();
-    pt_vec.reverse();
+    // Debug loop over each minute of the day
+    //----------------------------------
+    // clear_screen();
+    // let mut time_minutes = 0;
+    // while  time_minutes < 1440{
+    // std::thread::sleep_ms(5);
+    // --------------------------------
     
     // some temporary inits
     let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
@@ -287,30 +300,9 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         println!("---------------------");
         println!();
     }
-    // Debug loop over each minute of the day
-    //----------------------------------
-    // clear_screen();
-    // let mut time_minutes = 0;
-    // while  time_minutes < 1440{
-    // std::thread::sleep_ms(5);
-    // --------------------------------
+    
     for (i,pt) in pt_vec.iter().enumerate(){
-        if flag.tui{
-            tui();
-            break;
-        }
-        if flag.edit{
-            edit();
-            break;
-        }
-        if flag.notify{
-            Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
-            // loop{
-            //     std::thread::sleep_ms(1000);
-            //     break;
-            // }
-            break;
-        }
+           
         match flag.disp{ // only numbers or with info
             
             DispType::Normal => print!("{}:\t",names[i]),
@@ -348,7 +340,8 @@ fn handle_prayer_data(flag: Flag, cfg: Config){
         
         println!();
         
-    };
+    
+    }
     //------------------
     //time_minutes += 1;
     //}
@@ -394,8 +387,46 @@ fn main(){
         return;
     }
     
+    // data path
+    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+    data_path.push_str("/ptdata.csv");
     
-    handle_prayer_data(flag, cfg); // run main thing
+    // gets data from database
+    let raw_prayer_data: String = fs::read_to_string(data_path)
+        .expect("READ THE data.txt FILE DAMMIT");
+    
+    
+    let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
+    
+    let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
+    
+    let mut pt_vec = prayer_data[today].vec_from_island_set();
+    pt_vec.reverse();
+    pt_vec.pop();
+    pt_vec.pop();
+    pt_vec.reverse();
+    
+    let data :ProgramData = ProgramData { flag: flag, cfg: cfg, pt_vec: pt_vec };
+    
+    if flag.tui{
+        tui();
+    }
+    else if flag.edit{
+        edit();
+    }
+    else if flag.notify{
+        notify(data);
+        Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
+        // loop{
+        //     std::thread::sleep_ms(1000);
+        //     break;
+        // }
+        
+    }else{
+        print_prayer_data(&data);
+    }
+    
+    // handle_prayer_data(flag, cfg); // run main thing
     
 }
 
