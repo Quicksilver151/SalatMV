@@ -373,6 +373,7 @@ fn main(){
     
     // fetch flags
     let args : Vec<String> = env::args().collect();
+
     let flag: Flag = match flag_parser::parse_args(args){
         Ok(flag) => flag,
         Err(_flag) => return,
@@ -406,7 +407,6 @@ fn main(){
     pt_vec.pop();
     pt_vec.reverse();
     
-    let data :ProgramData = ProgramData { flag: flag, cfg: cfg, pt_vec: pt_vec };
     
     if flag.tui{
         tui();
@@ -415,6 +415,8 @@ fn main(){
         edit();
     }
     else if flag.notify{
+        
+        let data :ProgramData = ProgramData {flag, cfg, pt_vec };
         notify(data);
         Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
         // loop{
@@ -423,6 +425,8 @@ fn main(){
         // }
         
     }else{
+        
+        let data :ProgramData = ProgramData {flag, cfg, pt_vec };
         print_prayer_data(&data);
     }
     
