@@ -277,7 +277,6 @@ struct ProgramData{
 
 fn print_prayer_data(data: &ProgramData){
     let (flag,cfg,pt_vec) = (data.flag,data.cfg,data.pt_vec);
-    
     // Debug loop over each minute of the day
     //----------------------------------
     // clear_screen();
