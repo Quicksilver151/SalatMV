@@ -10,6 +10,7 @@ pub enum TimeType {TWHour,  TFHour}
 pub struct Flag{
     pub help    : bool,
     pub tui     : bool,
+    pub active  : bool,
     pub notify  : bool,
     pub edit    : bool,
     pub current : bool,
@@ -19,8 +20,20 @@ pub struct Flag{
     pub time    : TimeType,
 }
 
+// default params
 pub fn new_flag() -> Flag{
-    Flag {help:false, tui:false, notify:false, edit:false, current:false, title:false, disp:DispType::Normal, output:OutType::Hours, time:TimeType::TWHour}
+    Flag {
+        help    : false,
+        tui     : false,
+        active  : false,
+        notify  : false,
+        edit    : false,
+        current : false,
+        title   : false,
+        disp    : DispType::Normal,
+        output  : OutType::Hours,
+        time    : TimeType::TWHour
+    }
 }
 
 pub const HELP_TEXT : &str =
@@ -31,7 +44,8 @@ Usage: salat_mv [option]
 Options:
     -h, --help       shows this help section
     -T, --tui        runs in tui mode (not implemented yet)
-    -n, --notify     runs in notify mode (requires \'notify-send\' command)
+    -a, --active     keeps the program always running
+    -n, --notify     enables notifications when using -a, edits notifications when not using -a (requires \'notify-send\' command)
     -e, --edit       edit island index
     -c, --current    indicates the current time
     -t, --title      shows the title bar
@@ -65,6 +79,7 @@ pub fn parse_args(mut args : Vec<String> ) -> Result<Flag, Flag>{
             match argument{
                 "help"     => flag.help    = true,
                 "tui"      => flag.tui     = true,
+                "active"   => flag.active  = true,
                 "notify"   => flag.notify  = true,
                 "edit"     => flag.edit    = true,
                 "current"  => flag.current = true,
@@ -83,6 +98,7 @@ pub fn parse_args(mut args : Vec<String> ) -> Result<Flag, Flag>{
                 match argchar{
                     'h' => flag.help    = true,
                     'T' => flag.tui     = true,
+                    'a' => flag.active  = true,
                     'n' => flag.notify  = true,
                     'e' => flag.edit    = true,
                     'c' => flag.current = true,
