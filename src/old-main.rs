@@ -456,4 +456,4 @@ fn clear_screen(){
     print!("\x1B[2J");
     print!("\x1b[1;1H");
 }
-// TODO CURRENT DOESNT WORK AT EXACT TIME
+
