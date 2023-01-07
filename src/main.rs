@@ -285,9 +285,11 @@ fn main(){
         sleep(Duration::from_secs(1));
         clear_screen();
         a +=1;
-        if a == 5{break;}
+        if a == 60{break;}
     }
     exit_buffer();
+    
+    
     // if flag.tui{
     //     tui();
     // }
@@ -314,7 +316,16 @@ fn main(){
     
 }
 
+
+
+
+
+
+
 // smol functions
+// ==============
+
+// time converters
 fn get_current_time_in_minutes() -> i32 {
     let current_time = chrono::offset::Local::now();
     (current_time.hour() * 60 + current_time.minute()) as i32
@@ -324,7 +335,7 @@ fn get_current_time() -> (u32, u32, u32){
     (current_time.hour(), current_time.minute(), current_time.second())
 }
 
-
+// input management
 fn get_number_input() -> Result<usize,std::num::ParseIntError>{
     let mut input_text = String::new();
     std::io::stdin()
@@ -336,11 +347,11 @@ fn get_number_input() -> Result<usize,std::num::ParseIntError>{
 }
 
 
+// screen functions
 fn clear_screen(){
     print!("\x1B[2J");
     print!("\x1b[1;1H");
 }
-
 fn new_buffer(){
     print!("\x1b[?1049h");
 }
