@@ -303,7 +303,7 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
         let current_time = get_current_time_in_minutes();
         let (_,_,seconds) = get_current_time();
         
-        let current_time = 738;
+        // let current_time = 738;
         pt_vec.iter().for_each(|x| if seconds == 0 && x == &current_time{notify_send("ITS TIME")});
 
         prayer_data[today].flag_formatted_output(flag);
