@@ -1,4 +1,4 @@
-use std::{env::{self, current_exe}, fs, thread::sleep};
+use std::{env::{self, current_exe}, fs, thread::sleep, io::{Read, Write}};
 use chrono::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::process::Command;
@@ -215,6 +215,117 @@ impl PTDataParse for String{
     }
 }
 
+fn tui(){
+    
+}
+
+fn edit(){
+    
+    // start new session
+    print!("\x1b[?1049h");
+    println!("EDIT MODE\n changes are made to the config file\n");
+    
+    let raw_atoll_data : Vec<String> = get_data_from_file( "/atolls.csv");
+    let raw_island_data: Vec<String> = get_data_from_file("/islands.csv");
+    
+    // only [row][column:  0,1,2] useful (0 = atoll_index, 1=name, 2=dhi_name)
+    let atoll_data : Vec<Vec<&str>> = raw_atoll_data .iter().map(|x| x.split(';').collect()).collect();
+    
+    // only [row][coloumn: 0,2,3] useful (0 = time index, 2=atoll, 3=name, 4=dhi_name)
+    let island_data: Vec<Vec<&str>> = raw_island_data.iter().map(|x| x.split(';').collect()).collect();
+    
+    
+    clear_screen();
+    // print atoll list
+    println!("Index\tName\tDhiName");
+    println!("-----\t----\t-------");
+    atoll_data .iter().for_each(|x| println!("{}\t{}\t{}",x[0],x[1],x[2]));
+    println!("Input a number from the first colum to select Atoll(1 to 20) or select a timeset(41 to 82):");
+    let selected_atoll_index: usize = get_number_input().expect("Must be a non zero positive integer");
+    let selected_time_index : usize;
+    
+    if std::ops::RangeInclusive::new(1, 20).contains(&selected_atoll_index){
+        clear_screen();
+        // print island list for selected atoll
+        println!("{0: <5} | {1: <7} | {2: <15} | {3: <10}","Index","Timeset","Island Name","Dhi Name");
+        println!("-------------------------------------------");
+        let mut i = 0;
+        let mut selectables: Vec<usize> = vec![];
+        for island in island_data.iter(){
+            
+            if island[2].parse::<usize>().unwrap_or(1) == selected_atoll_index{
+                i += 1;
+                selectables.append(&mut vec![island[0].parse::<usize>().unwrap_or(41)]);
+                println!("{0: <5} | {1: <7} | {2: <15} | {3: <10}",i,island[0],island[3],island[4]);
+            }
+        }
+        
+        println!("Input a number from the first column to select prefered timeset:");
+        selected_time_index =  selectables[get_number_input().unwrap()];
+        
+    }else if std::ops::RangeInclusive::new(41, 82).contains(&selected_atoll_index){
+        selected_time_index = selected_atoll_index;
+        
+    }else{
+        
+        println!("\x1b[?1049l");
+        
+        panic!("value not within range");
+    }
+    
+    
+    
+    let new_cfg = Config{island_index:selected_time_index, island_name:"WIP".to_string()};
+    
+    confy::store("salat_mv",None, &new_cfg).unwrap();
+    
+    // exit new session
+    print!("\x1b[?1049l");
+    
+    println!("Timeset {} selected",selected_time_index);
+    
+    // println!("{}\n\n{}",atoll_data[3][0],island_data[2][3]);
+    
+    
+    // println!("edit: feature not implemented ([yet]->i hope)");
+    // same here
+}
+
+fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
+    
+    let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
+    
+    new_buffer();
+    // let mut a = 0;
+    loop{
+        
+        let pt_vec = prayer_data[today].vec_from_island_set();
+        let current_time = get_current_time_in_minutes();
+        let (_,_,seconds) = get_current_time();
+        
+        let current_time = 738;
+        pt_vec.iter().for_each(|x| if seconds == 0 && x == &current_time{notify_send("ITS TIME")});
+
+        prayer_data[today].flag_formatted_output(flag);
+        sleep(Duration::from_secs(1));
+        clear_screen();
+        // let mut input_text = String::new();
+        // std::io::stdin()
+        //     .read_line(&mut input_text)
+        //     .expect("failed to read from stdin");
+        // 
+        // 
+        // if input_text == "q\n".to_string(){break;}
+        // a +=1;
+        // if a == 60{break;}
+    }
+    // exit_buffer();   
+}
+fn notify_send(message:&str){
+    Command::new("notify-send").args(["--urgency=low", message]).output().expect("failed");
+}
+
+
 fn main(){
     // let new_data :PrayerData = PrayerData { island_index: 77, day: 233, fajr: 1234, sun: 1234, dhuhur: 1231, asr: 123, magrib: 12312, isha: 1231 };
     // new_data.output();
@@ -241,13 +352,12 @@ fn main(){
     
     // fetch flags
     let args : Vec<String> = env::args().collect();
-
     let flag: Flag = match flag_parser::parse_args(args){
         Ok(flag) => flag,
         Err(_flag) => return,
     };
     
-     
+    
     // main logic
     // ==========
     
@@ -276,47 +386,31 @@ fn main(){
     pt_vec.reverse();
     
     
-    // let data: ProgramData = ProgramData { flag, cfg, pt_vec};
-    new_buffer();
-    let mut a = 0;
-    loop{
+    if flag.tui{
+        tui();
+    }
+    else if flag.edit{
+        edit();
+    }
+    else if flag.active{
+        
+        active(prayer_data, &flag);
+        
+        // Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
+        // loop{
+        //     std::thread::sleep_ms(1000);
+        //     break;
+        // }
+        
+    }else{
         
         prayer_data[today].flag_formatted_output(&flag);
-        sleep(Duration::from_secs(1));
-        clear_screen();
-        a +=1;
-        if a == 60{break;}
+        
     }
-    exit_buffer();
     
-    
-    // if flag.tui{
-    //     tui();
-    // }
-    // else if flag.edit{
-    //     edit();
-    // }
-    // else if flag.notify{
-    //     
-    //     let data :ProgramData = ProgramData {flag, cfg, pt_vec };
-    //     notify(data);
-    //     Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
-    //     // loop{
-    //     //     std::thread::sleep_ms(1000);
-    //     //     break;
-    //     // }
-    //     
-    // }else{
-    //     
-    //     let data :ProgramData = ProgramData {flag, cfg, pt_vec };
-    //     print_prayer_data(&data);
-    // }
-    // 
     // handle_prayer_data(flag, cfg); // run main thing
     
 }
-
-
 
 
 
@@ -346,6 +440,20 @@ fn get_number_input() -> Result<usize,std::num::ParseIntError>{
     trimmed.parse::<usize>()   
 }
 
+// get csv data
+fn get_data_from_file(path:&str) -> Vec<String>{
+    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+    data_path.push_str(path);
+    
+     // gets data from database
+    let data : String = fs::read_to_string(data_path)
+        .expect("READ THE data.txt FILE DAMMIT");
+    
+    let mut grouped : Vec<&str> = data.split('\n').collect();
+    grouped.pop();
+    
+    grouped.iter().map(|x| x.parse::<String>().unwrap()).collect()
+}
 
 // screen functions
 fn clear_screen(){
@@ -358,4 +466,6 @@ fn new_buffer(){
 fn exit_buffer(){
     print!("\x1b[?1049l");
 }
+
+
 
