@@ -1,8 +1,9 @@
-use std::{env::{self, current_exe}, fs, thread::sleep, io::{Read, Write}};
+use std::{env::{self, current_exe}, fs, thread::sleep, thread, /* io::{Read, Write} */};
 use chrono::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::process::Command;
 use std::time::Duration;
+use signal_hook::{consts::SIGINT, iterator::Signals};
 
 mod flag_parser;
 use flag_parser::*;
@@ -326,7 +327,12 @@ fn notify_send(message:&str){
 }
 
 
+
+
 fn main(){
+    
+    handle_ctrlc();
+    
     // let new_data :PrayerData = PrayerData { island_index: 77, day: 233, fajr: 1234, sun: 1234, dhuhur: 1231, asr: 123, magrib: 12312, isha: 1231 };
     // new_data.output();
     // load config
@@ -466,6 +472,16 @@ fn new_buffer(){
 fn exit_buffer(){
     print!("\x1b[?1049l");
 }
-
+// handle SIGINT
+fn handle_ctrlc(){
+    let mut signals = Signals::new([SIGINT]).unwrap();
+    
+    thread::spawn(move || {
+        for sig in signals.wait() {
+            if sig == 2{exit_buffer();std::process::exit(SIGINT)}
+            println!("Received signal {:?}", sig);
+        }
+    });
+}
 
 
