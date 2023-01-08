@@ -1,10 +1,14 @@
-use std::{env::{self, current_exe}, fs, thread::sleep, thread, /* io::{Read, Write} */};
+//std
+use std::{process::Command, time::Duration, fs, env, thread};
+use env::current_exe;
+use thread::sleep;
+
+//crates
 use chrono::prelude::*;
 use serde::{Serialize, Deserialize};
-use std::process::Command;
-use std::time::Duration;
 use signal_hook::{consts::SIGINT, iterator::Signals};
 
+//files
 mod flag_parser;
 use flag_parser::*;
 
@@ -75,7 +79,7 @@ impl PrayerData{
         let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
         
         // optional title
-        if flag.disp == DispType::Normal && flag.title && !flag.tui && !flag.edit{
+        if flag.title && !flag.tui && !flag.edit{
             let (hour, minute, second) = get_current_time();
             
             println!("Salat_MV-cli");
@@ -478,7 +482,7 @@ fn handle_ctrlc(){
     
     thread::spawn(move || {
         for sig in signals.wait() {
-            if sig == 2{exit_buffer();std::process::exit(SIGINT)}
+            if sig == 2{exit_buffer();std::process::exit(0)}
             println!("Received signal {:?}", sig);
         }
     });
