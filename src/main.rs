@@ -301,7 +301,8 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
     let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
     
     new_buffer();
-    // let mut a = 0;
+    
+    // active loop
     loop{
         
         let pt_vec = prayer_data[today].vec_from_island_set();
@@ -309,27 +310,13 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
         let (_,_,seconds) = get_current_time();
         
         // let current_time = 738;
-        pt_vec.iter().for_each(|x| if seconds == 0 && x == &current_time{notify_send("ITS TIME")});
-
+        pt_vec.iter().for_each(|x| if seconds == 0 && x == &current_time && flag.notify{notify_send("ITS TIME")});
+        
         prayer_data[today].flag_formatted_output(flag);
         sleep(Duration::from_secs(1));
         clear_screen();
-        // let mut input_text = String::new();
-        // std::io::stdin()
-        //     .read_line(&mut input_text)
-        //     .expect("failed to read from stdin");
-        // 
-        // 
-        // if input_text == "q\n".to_string(){break;}
-        // a +=1;
-        // if a == 60{break;}
     }
-    // exit_buffer();   
 }
-fn notify_send(message:&str){
-    Command::new("notify-send").args(["--urgency=low", message]).output().expect("failed");
-}
-
 
 
 
@@ -487,5 +474,11 @@ fn handle_ctrlc(){
         }
     });
 }
+
+// notifications
+fn notify_send(message:&str){
+    Command::new("notify-send").args(["--urgency=critical", message]).output().expect("failed");
+}
+
 
 
