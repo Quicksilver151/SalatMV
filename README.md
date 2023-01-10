@@ -47,14 +47,15 @@ Usage: salat_mv [option]
 Options:
     -h, --help       shows this help section
     -T, --tui        runs in tui mode (not implemented yet)
-    -n, --notify     runs in notify mode (requires \'notify-send\' command)
+    -a, --active     keeps the program always running
+    -n, --notify     enables notifications when using -a, edits notifications when not using -a (requires 'notify-send' command)
     -e, --edit       edit island index
     -c, --current    indicates the current time
     -t, --title      shows the title bar
     -r, --raw-data   outputs raw data in hours and minutes
     -m, --minutes    outputs raw data in minutes
     -H, --hour       show time in 24 hour format
-
+    
 config contains island index
 config is stored in ~/.config/salat_mv/
 ```
