@@ -69,7 +69,11 @@ you can combine multiple flags like `salat_mv -ctH`
 
 ### version 1.0.0
 
-- [ ] Notifications via `notify-send`
+- [x] Notifications via `notify-send`
+
+- [ ] add notification editing
+
+- [ ] add notification missed message
 
 - [ ] Change edit mode to be more usable
 
