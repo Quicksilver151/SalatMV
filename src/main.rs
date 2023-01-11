@@ -84,7 +84,7 @@ impl PrayerData{
             
             println!("Salat_MV-cli");
             println!("---------------------");
-            println!("Time   :  {}:{}:{}", hour, minute, second); // TODO: let flag -H work
+            println!("Time   :  {}:{}:{}", hour.add_zero(), minute.add_zero(), second.add_zero()); // TODO: let flag -H work
             // println!("Island :  {}",cfg.island_name);
             println!("---------------------");
             println!();
@@ -140,11 +140,21 @@ impl PrayerData{
 
 
 trait TimeConversion{
+    fn add_zero(self) -> String;
     fn minutes_to_time(self, time_format: &TimeType) -> String;
 }
 
 impl TimeConversion for i32{
-    fn minutes_to_time(self, time_format: &TimeType)-> String{
+    fn add_zero(self:i32) -> String{
+        if self < 10 {
+            let mut string: String = "0".to_string();
+            string.push_str(&self.to_string());
+            string
+        }else{
+            self.to_string()
+        }
+    }
+    fn minutes_to_time(self, time_format: &TimeType) -> String{
         
         let minute = &self%60;
         let mut hour = self/60;
@@ -233,10 +243,10 @@ fn edit(){
     let raw_atoll_data : Vec<String> = get_data_from_file( "/atolls.csv");
     let raw_island_data: Vec<String> = get_data_from_file("/islands.csv");
     
-    // only [row][column:  0,1,2] useful (0 = atoll_index, 1=name, 2=dhi_name)
+    // [row][column:  0,1,2]   (0 = atoll_index, 1=name, 2=dhi_name)
     let atoll_data : Vec<Vec<&str>> = raw_atoll_data .iter().map(|x| x.split(';').collect()).collect();
     
-    // only [row][coloumn: 0,2,3] useful (0 = time index, 2=atoll, 3=name, 4=dhi_name)
+    // [row][coloumn: 0,2,3,4] (0 = time index, 2=atoll, 3=name, 4=dhi_name)
     let island_data: Vec<Vec<&str>> = raw_island_data.iter().map(|x| x.split(';').collect()).collect();
     
     
@@ -421,9 +431,9 @@ fn get_current_time_in_minutes() -> i32 {
     let current_time = chrono::offset::Local::now();
     (current_time.hour() * 60 + current_time.minute()) as i32
 }
-fn get_current_time() -> (u32, u32, u32){
+fn get_current_time() -> (i32, i32, i32){
     let current_time = chrono::offset::Local::now();
-    (current_time.hour(), current_time.minute(), current_time.second())
+    (current_time.hour() as i32, current_time.minute() as i32, current_time.second() as i32)
 }
 
 // input management
