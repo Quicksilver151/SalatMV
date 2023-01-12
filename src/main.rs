@@ -82,6 +82,8 @@ impl PrayerData{
         if flag.title && !flag.tui && !flag.edit{
             let (hour, minute, second) = get_current_time();
             
+            let (hour, time) = hour.to_12();
+            
             println!("Salat_MV-cli");
             println!("---------------------");
             println!("Time   :  {}:{}:{}", hour.add_zero(), minute.add_zero(), second.add_zero()); // TODO: let flag -H work
@@ -141,11 +143,12 @@ impl PrayerData{
 
 trait TimeConversion{
     fn add_zero(self) -> String;
+    fn to_12(self) -> (i32,String);
     fn minutes_to_time(self, time_format: &TimeType) -> String;
 }
 
 impl TimeConversion for i32{
-    fn add_zero(self:i32) -> String{
+    fn add_zero(self) -> String{
         if self < 10 {
             let mut string: String = "0".to_string();
             string.push_str(&self.to_string());
@@ -154,24 +157,33 @@ impl TimeConversion for i32{
             self.to_string()
         }
     }
+    fn to_12(self) -> (i32,String){
+        let half = if self > 11 {"pm"}else{"am"};
+        if self > 12{
+            (self - 12,half.to_string())
+        }else{
+            (self,half.to_string())
+        }
+    }
     fn minutes_to_time(self, time_format: &TimeType) -> String{
         
         let minute = &self%60;
         let mut hour = self/60;
         let mut full_time_string = "".to_owned();
-        let mut time = "";
+        let mut time = "".to_string();
         
         
         match time_format{
             TimeType::TWHour => {
-                time = "am";
-                if hour == 12{
-                    time = "pm";
-                }
-                if hour > 12{
-                    hour -= 12;
-                    time = "pm";
-                }
+                (hour,time) = hour.to_12();
+                // time = "am";
+                // if hour == 12{
+                //     time = "pm";
+                // }
+                // if hour > 12{
+                //     hour -= 12;
+                //     time = "pm";
+                // }
             }
             
             TimeType::TFHour => {}
@@ -189,7 +201,7 @@ impl TimeConversion for i32{
         }
         full_time_string.push_str(&minute.to_string());
         full_time_string.push(' ');
-        full_time_string.push_str(time);
+        full_time_string.push_str(&time);
         
         
         full_time_string
@@ -331,7 +343,11 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
 
 
 fn main(){
-    
+    // for i in 0..25{
+    //     dbg!(i);
+    //     dbg!(i.to_12());
+    // }
+    // return;
     handle_ctrlc();
     
     // let new_data :PrayerData = PrayerData { island_index: 77, day: 233, fajr: 1234, sun: 1234, dhuhur: 1231, asr: 123, magrib: 12312, isha: 1231 };
