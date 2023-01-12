@@ -80,13 +80,12 @@ impl PrayerData{
         
         // optional title
         if flag.title && !flag.tui && !flag.edit{
-            let (hour, minute, second) = get_current_time();
+            let (hour, minute, second, time) = get_current_time(&flag.time);
             
-            let (hour, time) = hour.to_12();
             
             println!("Salat_MV-cli");
             println!("---------------------");
-            println!("Time   :  {}:{}:{}", hour.add_zero(), minute.add_zero(), second.add_zero()); // TODO: let flag -H work
+            println!("Time   :  {}:{}:{} {}", hour.add_zero(), minute.add_zero(), second.add_zero(),time); // TODO: let flag -H work
             // println!("Island :  {}",cfg.island_name);
             println!("---------------------");
             println!();
@@ -329,7 +328,7 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
         
         let pt_vec = prayer_data[today].vec_from_island_set();
         let current_time = get_current_time_in_minutes();
-        let (_,_,seconds) = get_current_time();
+        let (_,_,seconds,_) = get_current_time(&flag.time);
         
         // let current_time = 738;
         pt_vec.iter().for_each(|x| if seconds == 0 && x == &current_time && flag.notify{notify_send("ITS TIME")});
@@ -447,9 +446,15 @@ fn get_current_time_in_minutes() -> i32 {
     let current_time = chrono::offset::Local::now();
     (current_time.hour() * 60 + current_time.minute()) as i32
 }
-fn get_current_time() -> (i32, i32, i32){
+fn get_current_time(format:&TimeType) -> (i32, i32, i32, String){
     let current_time = chrono::offset::Local::now();
-    (current_time.hour() as i32, current_time.minute() as i32, current_time.second() as i32)
+    match format{
+        TimeType::TFHour => (current_time.hour() as i32, current_time.minute() as i32, current_time.second() as i32, "".to_string()),
+        TimeType::TWHour => {
+            let (x,y) = (current_time.hour()as i32).to_12();
+            (x,current_time.minute() as i32, current_time.second() as i32, y)
+        },
+    }
 }
 
 // input management
