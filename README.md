@@ -1,14 +1,17 @@
 # SalatMV
 
-A cli version of salat mv.
+A cli version of the salat mv mobile app. Used to show prayer times in Maldives.
+
+This program uses the db from the salatmv app
+
+
 
 `~> salat_mv -t`
 
 ```
 Salat_MV-cli
 ---------------------
-Time   :  10:07 pm
-Island :  WIP
+Time   :  10:07:01 pm
 ---------------------
 
 Fajr:   04:50 am
@@ -25,19 +28,43 @@ Isha:   07:33 pm
 
 You can find the releases in the [releases](https://github.com/Quicksilver151/SalatMV/releases) tab
 
+only binaries for linux is available
+
 ## Building From Source
 
-### Linux
+### Linux (with the shellscript)
 
-- install rust/cargo on your system
-- run `git tag -l` to get a list of tags
-- run `git checkout [version]` to checkout to the latest tag (regular commits are not stable)
-- run `build_for_linux.sh`
-- a file link should be available in ./target
+- Install Rust/Cargo on your system
+- Run `git tag -l` to get a list of tags
+- Run `git checkout [version]` to checkout to the latest tag (regular commits are not stable)
+- Run `build_for_linux.sh`
+- A file link should be available in ./target
+
+### All Platforms (manually)
+
+- Install Git to on your system
+
+- Install Rust/Cargo on your system
+
+- Clone this repository with `git clone https://github.com/Quicksilver151/SalatMV.git`
+
+- Open the folder inside a terminal
+
+- Run `git tag -l` to get a list of tags
+
+- Run `git checkout [version name]` to checkout to the latest tag. eg `git checkout v0.3.1`
+
+- Run `cargo build --release`
+
+- Copy the csv files from `/src/` to `/target/release/`
+
+- The executable file will be inside `/target/release/`
+
+
 
 # Usage
 
-run `salat_mv --help` to get the following list of commands:
+Run `salat_mv --help` to get the following list of commands:
 
 ```css
 SalatMV for cli
@@ -55,12 +82,12 @@ Options:
     -r, --raw-data   outputs raw data in hours and minutes
     -m, --minutes    outputs raw data in minutes
     -H, --hour       show time in 24 hour format
-    
+
 config contains island index
 config is stored in ~/.config/salat_mv/
 ```
 
-you can combine multiple flags like `salat_mv -ctH`
+You can combine multiple flags like `salat_mv -ctH`
 
 # Todo:
 
@@ -72,9 +99,9 @@ you can combine multiple flags like `salat_mv -ctH`
 
 - [x] Notifications via `notify-send`
 
-- [ ] add notification editing
+- [ ] Add notification editing
 
-- [ ] add notification missed message
+- [ ] Add notification missed message
 
 - [ ] Change edit mode to be more usable
 
