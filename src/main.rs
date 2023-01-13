@@ -31,11 +31,6 @@ struct PrayerData{
     isha:   i32,
 }
 
-struct ProgramData{
-    flag:Flag,
-    cfg:Config,
-    pt_vec:Vec<i32>,
-}
 
 impl PrayerData{
     fn island_set_from_vec(&mut self, val: Vec<i32>){
@@ -60,11 +55,7 @@ impl PrayerData{
         
         val
     }
-
-    fn output(&self){
-        dbg!(self);
-    }
-
+    
     fn flag_formatted_output(&self, flag:&Flag){
         let (flag,pt_vec) = (flag,self.vec_from_island_set());
         // Debug loop over each minute of the day
@@ -143,7 +134,7 @@ impl PrayerData{
 trait TimeConversion{
     fn add_zero(self) -> String;
     fn to_12(self) -> (i32,String);
-    fn minutes_to_time(self, time_format: &TimeType) -> String;
+    fn minutes_to_time(self, time_format: &TimeFormat) -> String;
 }
 
 impl TimeConversion for i32{
@@ -164,46 +155,21 @@ impl TimeConversion for i32{
             (self,half.to_string())
         }
     }
-    fn minutes_to_time(self, time_format: &TimeType) -> String{
+    fn minutes_to_time(self, time_format: &TimeFormat) -> String{
         
         let minute = &self%60;
         let mut hour = self/60;
-        let mut full_time_string = "".to_owned();
-        let mut time = "".to_string();
-        
+        let mut period = "".to_string();
         
         match time_format{
-            TimeType::TWHour => {
-                (hour,time) = hour.to_12();
-                // time = "am";
-                // if hour == 12{
-                //     time = "pm";
-                // }
-                // if hour > 12{
-                //     hour -= 12;
-                //     time = "pm";
-                // }
-            }
-            
-            TimeType::TFHour => {}
+            TimeFormat::TWHour => {(hour,period) = hour.to_12()}
+            TimeFormat::TFHour => {}
         }
         
+        let hour   = hour  .add_zero();
+        let minute = minute.add_zero();
+        format!("{}:{} {}", hour, minute, period)
         
-        if hour < 10{
-            full_time_string.push('0');
-        }
-        full_time_string.push_str(&hour.to_string());
-        full_time_string.push(':');
-        
-        if minute < 10{
-            full_time_string.push('0');
-        }
-        full_time_string.push_str(&minute.to_string());
-        full_time_string.push(' ');
-        full_time_string.push_str(&time);
-        
-        
-        full_time_string
     }
 }
 
@@ -313,8 +279,6 @@ fn edit(){
     // println!("{}\n\n{}",atoll_data[3][0],island_data[2][3]);
     
     
-    // println!("edit: feature not implemented ([yet]->i hope)");
-    // same here
 }
 
 fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
@@ -401,13 +365,6 @@ fn main(){
     
     let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
     
-    let mut pt_vec = prayer_data[today].vec_from_island_set();
-    pt_vec.reverse();
-    pt_vec.pop();
-    pt_vec.pop();
-    pt_vec.reverse();
-    
-    
     if flag.tui{
         tui();
     }
@@ -446,13 +403,18 @@ fn get_current_time_in_minutes() -> i32 {
     let current_time = chrono::offset::Local::now();
     (current_time.hour() * 60 + current_time.minute()) as i32
 }
-fn get_current_time(format:&TimeType) -> (i32, i32, i32, String){
+fn get_current_time(format:&TimeFormat) -> (i32, i32, i32, String){
     let current_time = chrono::offset::Local::now();
     match format{
-        TimeType::TFHour => (current_time.hour() as i32, current_time.minute() as i32, current_time.second() as i32, "".to_string()),
-        TimeType::TWHour => {
-            let (x,y) = (current_time.hour()as i32).to_12();
-            (x,current_time.minute() as i32, current_time.second() as i32, y)
+        TimeFormat::TFHour => (
+            current_time.hour()   as i32,
+            current_time.minute() as i32,
+            current_time.second() as i32,
+            "".to_string()),
+
+        TimeFormat::TWHour => {
+            let (current_hour, period) = (current_time.hour()as i32).to_12();
+            (current_hour, current_time.minute() as i32, current_time.second() as i32, period)
         },
     }
 }
@@ -483,7 +445,7 @@ fn get_data_from_file(path:&str) -> Vec<String>{
     grouped.iter().map(|x| x.parse::<String>().unwrap()).collect()
 }
 
-// screen functions
+// terminal screen functions
 fn clear_screen(){
     print!("\x1B[2J");
     print!("\x1b[1;1H");
@@ -494,6 +456,7 @@ fn new_buffer(){
 fn exit_buffer(){
     print!("\x1b[?1049l");
 }
+
 // handle SIGINT
 fn handle_ctrlc(){
     let mut signals = Signals::new([SIGINT]).unwrap();
@@ -501,7 +464,6 @@ fn handle_ctrlc(){
     thread::spawn(move || {
         for sig in signals.wait() {
             if sig == 2{exit_buffer();std::process::exit(0)}
-            println!("Received signal {:?}", sig);
         }
     });
 }

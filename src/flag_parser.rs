@@ -4,7 +4,7 @@ pub enum DispType {Normal,     Raw}
 #[derive(Debug, PartialEq)]
 pub enum OutType  {Hours , Minutes}
 #[derive(Debug, PartialEq)]
-pub enum TimeType {TWHour,  TFHour}
+pub enum TimeFormat {TWHour,  TFHour}
 
 #[derive(Debug, PartialEq)]
 pub struct Flag{
@@ -17,7 +17,7 @@ pub struct Flag{
     pub title   : bool,
     pub disp    : DispType,
     pub output  : OutType,
-    pub time    : TimeType,
+    pub time    : TimeFormat,
 }
 
 // default params
@@ -32,7 +32,7 @@ pub fn new_flag() -> Flag{
         title   : false,
         disp    : DispType::Normal,
         output  : OutType::Hours,
-        time    : TimeType::TWHour
+        time    : TimeFormat::TWHour
     }
 }
 
@@ -86,7 +86,7 @@ pub fn parse_args(mut args : Vec<String> ) -> Result<Flag, Flag>{
                 "title"    => flag.title   = true,
                 "raw-data" => flag.disp    = DispType::Raw,
                 "minutes"  => flag.output  = OutType::Minutes,
-                "hour"     => flag.time    = TimeType::TFHour,
+                "hour"     => flag.time    = TimeFormat::TFHour,
                 
                  _  => {println!("===INVALID FLAG ENTERED===\n\n{}",HELP_TEXT);return Err(flag)}
             }
@@ -105,7 +105,7 @@ pub fn parse_args(mut args : Vec<String> ) -> Result<Flag, Flag>{
                     't' => flag.title   = true,
                     'r' => flag.disp    = DispType::Raw,
                     'm' => flag.output  = OutType::Minutes,
-                    'H' => flag.time    = TimeType::TFHour,
+                    'H' => flag.time    = TimeFormat::TFHour,
                     
                      _  => {println!("==INVALID FLAG ENTERED===\n\n{}",HELP_TEXT);return Err(flag)}
                 }
