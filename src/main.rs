@@ -11,6 +11,8 @@ use signal_hook::{consts::SIGINT, iterator::Signals};
 //files
 mod flag_parser;
 use flag_parser::*;
+mod db;
+use db::*;
 
 
 #[derive(Default, Debug, Serialize, Deserialize)]
@@ -20,38 +22,38 @@ struct Config{
 }
 
 #[derive(Debug)]
-struct PrayerData{
-    island_index: i32,
-    day:    i32,
-    fajr:   i32,
-    sun:    i32,
-    dhuhur: i32,
-    asr:    i32,
-    magrib: i32,
-    isha:   i32,
+pub struct PrayerData{
+    island_index: u32,
+    day:    u32,
+    fajr:   u32,
+    sun:    u32,
+    dhuhur: u32,
+    asr:    u32,
+    magrib: u32,
+    isha:   u32,
 }
 
 
 impl PrayerData{
-    fn island_set_from_vec(&mut self, val: Vec<i32>){
-        self.island_index = val[0];
-        self.day    = val[1];
-        self.fajr   = val[2];
-        self.sun    = val[3];
-        self.dhuhur = val[4];
-        self.asr    = val[5];
-        self.magrib = val[6];
-        self.isha   = val[7];
-    }
+    // fn island_set_from_vec(&mut self, val: Vec<u32>){
+    //     self.island_index = val[0];
+    //     self.day    = val[1];
+    //     self.fajr   = val[2];
+    //     self.sun    = val[3];
+    //     self.dhuhur = val[4];
+    //     self.asr    = val[5];
+    //     self.magrib = val[6];
+    //     self.isha   = val[7];
+    // }
     
     fn vec_from_island_set(&self) -> Vec<i32>{
         let mut val = vec![0;6];
-        val[0] = self.fajr;
-        val[1] = self.sun;
-        val[2] = self.dhuhur;
-        val[3] = self.asr;
-        val[4] = self.magrib;
-        val[5] = self.isha;
+        val[0] = self.fajr   as i32;
+        val[1] = self.sun    as i32;
+        val[2] = self.dhuhur as i32;
+        val[3] = self.asr    as i32;
+        val[4] = self.magrib as i32;
+        val[5] = self.isha   as i32;
         
         val
     }
@@ -83,7 +85,7 @@ impl PrayerData{
         }
         
         for (i,pt) in pt_vec.iter().enumerate(){
-               
+            
             match flag.disp{ // only numbers or with info
                 
                 DispType::Normal => print!("{}:\t",names[i]),
@@ -94,10 +96,10 @@ impl PrayerData{
                 OutType::Minutes => print!("{}",pt),
             }
             if flag.current{
-                let time_minutes = get_current_time_in_minutes();
-                let prev_diff = {if i > 0{pt_vec[i-1]-time_minutes}else{pt_vec[5]-time_minutes}};
-                let diff = pt-time_minutes;
-                let next_diff = {if i < 5{pt_vec[i+1]-time_minutes}else{pt_vec[0]-time_minutes}};
+                let time_minutes : i32 = get_current_time_in_minutes() as i32;
+                let prev_diff    : i32 = {if i > 0{pt_vec[i-1]-time_minutes}else{pt_vec[5]-time_minutes}};
+                let diff         : i32 = pt - time_minutes;
+                let next_diff    : i32 = {if i < 5{pt_vec[i+1]-time_minutes}else{pt_vec[0]-time_minutes}};
                 
                 let tail_prev_len = "-".repeat(10.min(prev_diff.abs()/10) as usize);
                 let tail_next_len = "-".repeat(10.min(next_diff.abs()/10) as usize);
@@ -122,10 +124,7 @@ impl PrayerData{
             println!();
             
         }
-        //------------------
-        //time_minutes += 1;
-        //}
-        //-----------------
+        
     }
     
 }
@@ -133,10 +132,9 @@ impl PrayerData{
 
 trait TimeConversion{
     fn add_zero(self) -> String;
-    fn to_12(self) -> (i32,String);
+    fn to_12(self) -> (u32,String);
     fn minutes_to_time(self, time_format: &TimeFormat) -> String;
 }
-
 impl TimeConversion for i32{
     fn add_zero(self) -> String{
         if self < 10 {
@@ -147,7 +145,45 @@ impl TimeConversion for i32{
             self.to_string()
         }
     }
-    fn to_12(self) -> (i32,String){
+
+    fn to_12(self) -> (u32,String){
+        let half = if self > 11 {"pm"}else{"am"};
+        if self > 12{
+            (self as u32 - 12,half.to_string())
+        }else{
+            (self as u32 ,half.to_string())
+        }
+    }
+    fn minutes_to_time(self, time_format: &TimeFormat) -> String{
+        
+        let minute = &self%60;
+        let mut hour = self as u32 /60;
+        let mut period = "".to_string();
+        
+        match time_format{
+            TimeFormat::TWHour => {(hour,period) = hour.to_12()}
+            TimeFormat::TFHour => {}
+        }
+        
+        let hour   = hour  .add_zero();
+        let minute = minute.add_zero();
+        format!("{}:{} {}", hour, minute, period)
+        
+    }
+}
+
+impl TimeConversion for u32{
+    fn add_zero(self) -> String{
+        if self < 10 {
+            let mut string: String = "0".to_string();
+            string.push_str(&self.to_string());
+            string
+        }else{
+            self.to_string()
+        }
+    }
+
+    fn to_12(self) -> (u32,String){
         let half = if self > 11 {"pm"}else{"am"};
         if self > 12{
             (self - 12,half.to_string())
@@ -177,42 +213,11 @@ trait PTDataParse {
     fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>;
 }
 
-impl PTDataParse for String{
-    fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>{
-        // split by line for each valid data
-        let mut grouped :Vec<&str> = self.split('\n').collect();
-        grouped.pop(); // remove last line
-        grouped.reverse();
-        grouped.pop(); // remove first line
-        grouped.reverse();
-        
-        let mut full_list: Vec<PrayerData> = vec![];
-        
-        // split by column for each valid data
-        for group in grouped{
-            let columns: Vec<&str> = group.split(';').collect();
-            
-            if island_index != columns[0].parse::<i32>().unwrap(){
-                continue;
-            }
-            
-            let mut result : PrayerData = PrayerData { island_index: (0), day: (0), fajr: (0), sun: (0), dhuhur: (0), asr: (0), magrib: (0), isha: (0) };
-            
-            result.island_set_from_vec(columns.iter().map(|x| x.parse::<i32>().unwrap()).collect());
-            full_list.append(&mut vec![result]);
-            
-        }
-        
-        full_list   
-    }
-}
-
 fn tui(){
     
 }
 
 fn edit(){
-    
     // start new session
     print!("\x1b[?1049h");
     println!("EDIT MODE\n changes are made to the config file\n");
@@ -291,7 +296,7 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
     loop{
         
         let pt_vec = prayer_data[today].vec_from_island_set();
-        let current_time = get_current_time_in_minutes();
+        let current_time = get_current_time_in_minutes() as i32;
         let (_,_,seconds,_) = get_current_time(&flag.time);
         
         // let current_time = 738;
@@ -306,17 +311,13 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
 
 
 fn main(){
-    // for i in 0..25{
-    //     dbg!(i);
-    //     dbg!(i.to_12());
-    // }
-    // return;
+    
     handle_ctrlc();
     
     // let new_data :PrayerData = PrayerData { island_index: 77, day: 233, fajr: 1234, sun: 1234, dhuhur: 1231, asr: 123, magrib: 12312, isha: 1231 };
     // new_data.output();
+    
     // load config
-    //
     let cfg_result : Result<Config,confy::ConfyError> = confy::load("salat_mv", None);
     let mut cfg = match cfg_result{
         Ok(cfg_result)  => cfg_result,
@@ -352,17 +353,13 @@ fn main(){
         return;
     }
     
-    // data path
-    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
-    data_path.push_str("/ptdata.csv");
+    // data path (depreciated)
+    // let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+    // data_path.push_str("/ptdata.csv");
     
-    // gets data from database
-    let raw_prayer_data: String = fs::read_to_string(data_path)
-        .expect("READ THE data.txt FILE DAMMIT");
-    
-    
-    let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
-    
+    // gets data from hard coded values
+    let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index as u32);
+
     let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
     
     if flag.tui{
@@ -371,6 +368,7 @@ fn main(){
     else if flag.edit{
         edit();
     }
+    
     else if flag.active{
         
         active(prayer_data, &flag);
@@ -394,27 +392,26 @@ fn main(){
 
 
 
-
 // smol functions
 // ==============
 
 // time converters
-fn get_current_time_in_minutes() -> i32 {
+fn get_current_time_in_minutes() -> u32 {
     let current_time = chrono::offset::Local::now();
-    (current_time.hour() * 60 + current_time.minute()) as i32
+    current_time.hour() * 60 + current_time.minute()
 }
-fn get_current_time(format:&TimeFormat) -> (i32, i32, i32, String){
+fn get_current_time(format:&TimeFormat) -> (u32, u32, u32, String){
     let current_time = chrono::offset::Local::now();
     match format{
         TimeFormat::TFHour => (
-            current_time.hour()   as i32,
-            current_time.minute() as i32,
-            current_time.second() as i32,
+            current_time.hour(),
+            current_time.minute(),
+            current_time.second(),
             "".to_string()),
-
+            
         TimeFormat::TWHour => {
-            let (current_hour, period) = (current_time.hour()as i32).to_12();
-            (current_hour, current_time.minute() as i32, current_time.second() as i32, period)
+            let (current_hour, period) = current_time.hour().to_12();
+            (current_hour, current_time.minute(), current_time.second(), period)
         },
     }
 }
@@ -430,7 +427,29 @@ fn get_number_input() -> Result<usize,std::num::ParseIntError>{
     trimmed.parse::<usize>()   
 }
 
-// get csv data
+// get db data
+fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
+    let mut island_data:Vec<PrayerData> = vec![];
+    for row in PTDATA{
+        if row[0] == timeset_index{
+            let pt_data: PrayerData = PrayerData {
+                island_index: row[0],
+                day    :  row[1],
+                fajr   :  row[2],
+                sun    :  row[3],
+                dhuhur :  row[4],
+                asr    :  row[5],
+                magrib :  row[6],
+                isha   :  row[7],
+            };
+            island_data.append(&mut vec![pt_data]);
+        }
+    }
+    
+    island_data    
+}
+
+// TODO: relocate csv data to db.rs
 fn get_data_from_file(path:&str) -> Vec<String>{
     let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
     data_path.push_str(path);
