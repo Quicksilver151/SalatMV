@@ -449,7 +449,7 @@ fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
     island_data    
 }
 
-// TODO: relocate csv data to db.rs
+// TODO: change of plans: learn to use build.rs to parse all the data at compile time
 fn get_data_from_file(path:&str) -> Vec<String>{
     let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
     data_path.push_str(path);
