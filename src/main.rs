@@ -11,9 +11,10 @@ use signal_hook::{consts::SIGINT, iterator::Signals};
 //files
 mod flag_parser;
 use flag_parser::*;
-mod db;
-use db::*;
 
+pub static PT_DAT_RAW : &str = include_str!("./ptdata.csv");
+pub static ATOLLS_DAT : &str = include_str!("./atolls.csv");
+pub static ISLAND_DAT : &str = include_str!("./islands.csv");
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 struct Config{
@@ -35,16 +36,16 @@ pub struct PrayerData{
 
 
 impl PrayerData{
-    // fn island_set_from_vec(&mut self, val: Vec<u32>){
-    //     self.island_index = val[0];
-    //     self.day    = val[1];
-    //     self.fajr   = val[2];
-    //     self.sun    = val[3];
-    //     self.dhuhur = val[4];
-    //     self.asr    = val[5];
-    //     self.magrib = val[6];
-    //     self.isha   = val[7];
-    // }
+    fn island_set_from_vec(&mut self, val: Vec<u32>){
+        self.island_index = val[0];
+        self.day    = val[1];
+        self.fajr   = val[2];
+        self.sun    = val[3];
+        self.dhuhur = val[4];
+        self.asr    = val[5];
+        self.magrib = val[6];
+        self.isha   = val[7];
+    }
     
     fn vec_from_island_set(&self) -> Vec<i32>{
         let mut val = vec![0;6];
@@ -124,7 +125,10 @@ impl PrayerData{
             println!();
             
         }
-        
+        //------------------
+        //time_minutes += 1;
+        //}
+        //-----------------
     }
     
 }
@@ -213,6 +217,36 @@ trait PTDataParse {
     fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>;
 }
 
+impl PTDataParse for String{
+    fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>{
+        // split by line for each valid data
+        let mut grouped :Vec<&str> = self.split('\n').collect();
+        grouped.pop(); // remove last line
+        grouped.reverse();
+        grouped.pop(); // remove first line
+        grouped.reverse();
+        
+        let mut full_list: Vec<PrayerData> = vec![];
+        
+        // split by column for each valid data
+        for group in grouped{
+            let columns: Vec<&str> = group.split(';').collect();
+            
+            if island_index != columns[0].parse::<i32>().unwrap(){
+                continue;
+            }
+            
+            let mut result : PrayerData = PrayerData { island_index: (0), day: (0), fajr: (0), sun: (0), dhuhur: (0), asr: (0), magrib: (0), isha: (0) };
+            
+            result.island_set_from_vec(columns.iter().map(|x| x.parse::<u32>().unwrap()).collect());
+            full_list.append(&mut vec![result]);
+            
+        }
+        
+        full_list   
+    }
+}
+
 fn tui(){
     
 }
@@ -222,8 +256,8 @@ fn edit(){
     print!("\x1b[?1049h");
     println!("EDIT MODE\n changes are made to the config file\n");
     
-    let raw_atoll_data : Vec<String> = get_data_from_file( "/atolls.csv");
-    let raw_island_data: Vec<String> = get_data_from_file("/islands.csv");
+    let raw_atoll_data : Vec<String> = get_vec_from_db(ATOLLS_DAT);
+    let raw_island_data: Vec<String> = get_vec_from_db(ISLAND_DAT);
     
     // [row][column:  0,1,2]   (0 = atoll_index, 1=name, 2=dhi_name)
     let atoll_data : Vec<Vec<&str>> = raw_atoll_data .iter().map(|x| x.split(';').collect()).collect();
@@ -271,6 +305,7 @@ fn edit(){
     }
     
     
+
     
     let new_cfg = Config{island_index:selected_time_index, island_name:"WIP".to_string()};
     
@@ -311,13 +346,17 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
 
 
 fn main(){
-    
+    // for i in 0..25{
+    //     dbg!(i);
+    //     dbg!(i.to_12());
+    // }
+    // return;
     handle_ctrlc();
     
     // let new_data :PrayerData = PrayerData { island_index: 77, day: 233, fajr: 1234, sun: 1234, dhuhur: 1231, asr: 123, magrib: 12312, isha: 1231 };
     // new_data.output();
-    
     // load config
+    //
     let cfg_result : Result<Config,confy::ConfyError> = confy::load("salat_mv", None);
     let mut cfg = match cfg_result{
         Ok(cfg_result)  => cfg_result,
@@ -353,12 +392,15 @@ fn main(){
         return;
     }
     
-    // data path (depreciated)
-    // let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
-    // data_path.push_str("/ptdata.csv");
+    // data path
+    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
+    data_path.push_str("/ptdata.csv");
     
-    // gets data from hard coded values
-    let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index as u32);
+    // gets data from database
+    let raw_prayer_data: String = PT_DAT_RAW.to_string();
+    
+    let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
+    // let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index as u32);
 
     let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
     
@@ -368,7 +410,6 @@ fn main(){
     else if flag.edit{
         edit();
     }
-    
     else if flag.active{
         
         active(prayer_data, &flag);
@@ -388,6 +429,7 @@ fn main(){
     // handle_prayer_data(flag, cfg); // run main thing
     
 }
+
 
 
 
@@ -428,37 +470,32 @@ fn get_number_input() -> Result<usize,std::num::ParseIntError>{
 }
 
 // get db data
-fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
-    let mut island_data:Vec<PrayerData> = vec![];
-    for row in PTDATA{
-        if row[0] == timeset_index{
-            let pt_data: PrayerData = PrayerData {
-                island_index: row[0],
-                day    :  row[1],
-                fajr   :  row[2],
-                sun    :  row[3],
-                dhuhur :  row[4],
-                asr    :  row[5],
-                magrib :  row[6],
-                isha   :  row[7],
-            };
-            island_data.append(&mut vec![pt_data]);
-        }
-    }
-    
-    island_data    
-}
 
-// TODO: change of plans: learn to use build.rs to parse all the data at compile time
-fn get_data_from_file(path:&str) -> Vec<String>{
-    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
-    data_path.push_str(path);
-    
-     // gets data from database
-    let data : String = fs::read_to_string(data_path)
-        .expect("READ THE data.txt FILE DAMMIT");
-    
-    let mut grouped : Vec<&str> = data.split('\n').collect();
+
+// fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
+//     let mut island_data:Vec<PrayerData> = vec![];
+//     for row in PTDATA{
+//         if row[0] == timeset_index{
+//             let pt_data: PrayerData = PrayerData {
+//                 island_index: row[0],
+//                 day    :  row[1],
+//                 fajr   :  row[2],
+//                 sun    :  row[3],
+//                 dhuhur :  row[4],
+//                 asr    :  row[5],
+//                 magrib :  row[6],
+//                 isha   :  row[9],
+//             };
+//             island_data.append(&mut vec![pt_data]);
+//         }
+//     }
+//     
+//     island_data
+//     
+// }
+
+fn get_vec_from_db(db: &str) -> Vec<String>{
+    let mut grouped : Vec<&str> = db.split('\n').collect();
     grouped.pop();
     
     grouped.iter().map(|x| x.parse::<String>().unwrap()).collect()
