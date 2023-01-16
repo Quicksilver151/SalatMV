@@ -287,6 +287,7 @@ dependencies = [
  "confy",
  "serde",
  "signal-hook",
+ "uneval",
 ]
 
 [[package]]
@@ -392,6 +393,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1333c76748e868a4d9d1017b5ab53171dfd095f70c712fdb4653a406547f598f"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "uneval"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63cc5d2fd8648d7e2be86098f60c9ece7045cc710b3c1e226910e2f37d11dc73"
+dependencies = [
+ "serde",
+ "thiserror",
 ]
 
 [[package]]
