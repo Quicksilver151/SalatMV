@@ -1,5 +1,5 @@
 //std
-use std::{process::Command, time::Duration, fs, env, thread};
+use std::{process::Command, time::Duration, env, thread};
 use env::current_exe;
 use thread::sleep;
 
@@ -11,6 +11,10 @@ use signal_hook::{consts::SIGINT, iterator::Signals};
 //files
 mod flag_parser;
 use flag_parser::*;
+
+
+mod db;
+use db::PTDATA;
 
 pub static PT_DAT_RAW : &str = include_str!("./ptdata.csv");
 pub static ATOLLS_DAT : &str = include_str!("./atolls.csv");
@@ -396,10 +400,10 @@ fn main(){
     data_path.push_str("/ptdata.csv");
     
     // gets data from database
-    let raw_prayer_data: String = PT_DAT_RAW.to_string();
+    // let raw_prayer_data: String = PT_DAT_RAW.to_string();
     
-    let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
-    // let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index as u32);
+    // let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
+    let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index as u32);
 
     let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
     
@@ -471,27 +475,27 @@ fn get_number_input() -> Result<usize,std::num::ParseIntError>{
 // get db data
 
 
-// fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
-//     let mut island_data:Vec<PrayerData> = vec![];
-//     for row in PTDATA{
-//         if row[0] == timeset_index{
-//             let pt_data: PrayerData = PrayerData {
-//                 island_index: row[0],
-//                 day    :  row[1],
-//                 fajr   :  row[2],
-//                 sun    :  row[3],
-//                 dhuhur :  row[4],
-//                 asr    :  row[5],
-//                 magrib :  row[6],
-//                 isha   :  row[9],
-//             };
-//             island_data.append(&mut vec![pt_data]);
-//         }
-//     }
-//     
-//     island_data
-//     
-// }
+fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
+    let mut island_data:Vec<PrayerData> = vec![];
+    for row in PTDATA{
+        if row[0] == timeset_index{
+            let pt_data: PrayerData = PrayerData {
+                island_index: row[0],
+                day    :  row[1],
+                fajr   :  row[2],
+                sun    :  row[3],
+                dhuhur :  row[4],
+                asr    :  row[5],
+                magrib :  row[6],
+                isha   :  row[9],
+            };
+            island_data.append(&mut vec![pt_data]);
+        }
+    }
+    
+    island_data
+    
+}
 
 fn get_vec_from_db(db: &str) -> Vec<String>{
     let mut grouped : Vec<&str> = db.split('\n').collect();
