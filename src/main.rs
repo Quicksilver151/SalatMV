@@ -487,7 +487,7 @@ fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
                 dhuhur :  row[4],
                 asr    :  row[5],
                 magrib :  row[6],
-                isha   :  row[9],
+                isha   :  row[7],
             };
             island_data.append(&mut vec![pt_data]);
         }
