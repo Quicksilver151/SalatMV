@@ -323,13 +323,12 @@ fn edit(){
 
 fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
     
-    let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
-    
+        
     new_buffer();
     
     // active loop
     loop{
-        
+        let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
         let pt_vec = prayer_data[today].vec_from_island_set();
         let current_time = get_current_time_in_minutes() as i32;
         let (_,_,seconds,_) = get_current_time(&flag.time);
