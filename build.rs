@@ -41,7 +41,7 @@ impl PTDataParse for String{
 fn format_as_rust_vec(pt_data:Vec<Vec<u32>>) -> String{
     let mut string : String = "".to_string();
     let default_str: String =
-" pub static PTDATA: & [[u32; 8]; 15372] = &[".to_string();
+"pub static PTDATA: & [[u32; 8]; 15372] = &[".to_string();
     string.push_str(&default_str);
     for i in pt_data{
         string.push_str(&format!("{:?},\n",i));
