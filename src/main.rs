@@ -51,8 +51,8 @@ impl PrayerData{
             sun   : val[3],
             dhuhur: val[4],
             asr   : val[5],
-            magrib: val[5],
-            isha  : val[6]
+            magrib: val[6],
+            isha  : val[7]
         }
     }
     
