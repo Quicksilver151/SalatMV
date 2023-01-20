@@ -1,6 +1,5 @@
 //std
 use std::{process::Command, time::Duration, env, thread};
-use env::current_exe;
 use thread::sleep;
 
 //crates
@@ -40,15 +39,21 @@ pub struct PrayerData{
 
 
 impl PrayerData{
-    fn island_set_from_vec(&mut self, val: Vec<u32>){
-        self.island_index = val[0];
-        self.day    = val[1];
-        self.fajr   = val[2];
-        self.sun    = val[3];
-        self.dhuhur = val[4];
-        self.asr    = val[5];
-        self.magrib = val[6];
-        self.isha   = val[7];
+    // fn new() -> PrayerData{
+    //     PrayerData { island_index: 0, day: 0, fajr: 0, sun: 0, dhuhur: 0, asr: 0, magrib: 0, isha: 0}
+    // }
+    
+    fn island_set_from_vec(val: Vec<u32>) -> PrayerData{
+        PrayerData {
+            island_index: val[0],
+            day   : val[1],
+            fajr  : val[2],
+            sun   : val[3],
+            dhuhur: val[4],
+            asr   : val[5],
+            magrib: val[5],
+            isha  : val[6]
+        }
     }
     
     fn vec_from_island_set(&self) -> Vec<i32>{
@@ -65,13 +70,6 @@ impl PrayerData{
     
     fn flag_formatted_output(&self, flag:&Flag){
         let (flag,pt_vec) = (flag,self.vec_from_island_set());
-        // Debug loop over each minute of the day
-        //----------------------------------
-        // clear_screen();
-        // let mut time_minutes = 0;
-        // while  time_minutes < 1440{
-        // std::thread::sleep_ms(5);
-        // --------------------------------
         
         // some temporary inits
         let names = vec!["Fajr","Sun","Dhuhur","Asr","Magrib","Isha"];
@@ -126,15 +124,9 @@ impl PrayerData{
                 }
             }
             
-            println!();
-            
+            println!();       
         }
-        //------------------
-        //time_minutes += 1;
-        //}
-        //-----------------
     }
-    
 }
 
 
@@ -143,7 +135,9 @@ trait TimeConversion{
     fn to_12(self) -> (u32,String);
     fn minutes_to_time(self, time_format: &TimeFormat) -> String;
 }
+
 impl TimeConversion for i32{
+    
     fn add_zero(self) -> String{
         if self < 10 {
             let mut string: String = "0".to_string();
@@ -153,7 +147,7 @@ impl TimeConversion for i32{
             self.to_string()
         }
     }
-
+    
     fn to_12(self) -> (u32,String){
         let half = if self > 11 {"pm"}else{"am"};
         if self > 12{
@@ -162,6 +156,7 @@ impl TimeConversion for i32{
             (self as u32 ,half.to_string())
         }
     }
+    
     fn minutes_to_time(self, time_format: &TimeFormat) -> String{
         
         let minute = &self%60;
@@ -181,6 +176,7 @@ impl TimeConversion for i32{
 }
 
 impl TimeConversion for u32{
+    
     fn add_zero(self) -> String{
         if self < 10 {
             let mut string: String = "0".to_string();
@@ -190,7 +186,7 @@ impl TimeConversion for u32{
             self.to_string()
         }
     }
-
+    
     fn to_12(self) -> (u32,String){
         let half = if self > 11 {"pm"}else{"am"};
         if self > 12{
@@ -199,6 +195,7 @@ impl TimeConversion for u32{
             (self,half.to_string())
         }
     }
+    
     fn minutes_to_time(self, time_format: &TimeFormat) -> String{
         
         let minute = &self%60;
@@ -213,50 +210,26 @@ impl TimeConversion for u32{
         let hour   = hour  .add_zero();
         let minute = minute.add_zero();
         format!("{}:{} {}", hour, minute, period)
-        
     }
 }
 
-trait PTDataParse {
-    fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>;
-}
 
-impl PTDataParse for String{
-    fn parse_for_island(self, island_index: i32) -> Vec<PrayerData>{
-        // split by line for each valid data
-        let mut grouped :Vec<&str> = self.split('\n').collect();
-        grouped.pop(); // remove last line
-        grouped.reverse();
-        grouped.pop(); // remove first line
-        grouped.reverse();
-        
-        let mut full_list: Vec<PrayerData> = vec![];
-        
-        // split by column for each valid data
-        for group in grouped{
-            let columns: Vec<&str> = group.split(';').collect();
-            
-            if island_index != columns[0].parse::<i32>().unwrap(){
-                continue;
-            }
-            
-            let mut result : PrayerData = PrayerData { island_index: (0), day: (0), fajr: (0), sun: (0), dhuhur: (0), asr: (0), magrib: (0), isha: (0) };
-            
-            result.island_set_from_vec(columns.iter().map(|x| x.parse::<u32>().unwrap()).collect());
-            full_list.append(&mut vec![result]);
-            
-        }
-        
-        full_list   
-    }
-}
 
+// ===
+// TUI
+// ===
 fn tui(){
     
 }
 
+
+
+// ====
+// EDIT
+// ====
 fn edit(){
-    // start new session
+    
+    // start new buffer
     print!("\x1b[?1049h");
     println!("EDIT MODE\n changes are made to the config file\n");
     
@@ -271,23 +244,27 @@ fn edit(){
     
     
     clear_screen();
-    // print atoll list
+    // atoll title
     println!("Index\tName\tDhiName");
     println!("-----\t----\t-------");
-    atoll_data .iter().for_each(|x| println!("{}\t{}\t{}",x[0],x[1],x[2]));
+    
+    // print atoll list
+    atoll_data.iter().for_each(|x| println!("{}\t{}\t{}",x[0],x[1],x[2]));
     println!("Input a number from the first colum to select Atoll(1 to 20) or select a timeset(41 to 82):");
     let selected_atoll_index: usize = get_number_input().expect("Must be a non zero positive integer");
     let selected_time_index : usize;
     
     if std::ops::RangeInclusive::new(1, 20).contains(&selected_atoll_index){
+        
         clear_screen();
-        // print island list for selected atoll
+        // island title
         println!("{0: <5} | {1: <7} | {2: <15} | {3: <10}","Index","Timeset","Island Name","Dhi Name");
         println!("-------------------------------------------");
         let mut i = 0;
         let mut selectables: Vec<usize> = vec![];
+        
+        // print island list
         for island in island_data.iter(){
-            
             if island[2].parse::<usize>().unwrap_or(1) == selected_atoll_index{
                 i += 1;
                 selectables.append(&mut vec![island[0].parse::<usize>().unwrap_or(41)]);
@@ -297,11 +274,12 @@ fn edit(){
         
         println!("Input a number from the first column to select prefered timeset:");
         selected_time_index =  selectables[get_number_input().unwrap()];
+    }
+    else if std::ops::RangeInclusive::new(41, 82).contains(&selected_atoll_index){
         
-    }else if std::ops::RangeInclusive::new(41, 82).contains(&selected_atoll_index){
         selected_time_index = selected_atoll_index;
-        
-    }else{
+    }
+    else{
         
         println!("\x1b[?1049l");
         
@@ -309,25 +287,24 @@ fn edit(){
     }
     
     
-
-    
     let new_cfg = Config{island_index:selected_time_index, island_name:"WIP".to_string()};
     
     confy::store("salat_mv",None, &new_cfg).unwrap();
     
-    // exit new session
+    // exit new buffer
     print!("\x1b[?1049l");
     
     println!("Timeset {} selected",selected_time_index);
-    
-    // println!("{}\n\n{}",atoll_data[3][0],island_data[2][3]);
-    
-    
 }
 
+
+
+// ======
+// ACTIVE
+// ======
 fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
     
-        
+    
     new_buffer();
     
     // active loop
@@ -348,18 +325,15 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag){
 
 
 
+// ====
+// MAIN
+// ====
 fn main(){
-    // for i in 0..25{
-    //     dbg!(i);
-    //     dbg!(i.to_12());
-    // }
-    // return;
+    
+    // init
     handle_ctrlc();
     
-    // let new_data :PrayerData = PrayerData { island_index: 77, day: 233, fajr: 1234, sun: 1234, dhuhur: 1231, asr: 123, magrib: 12312, isha: 1231 };
-    // new_data.output();
     // load config
-    //
     let cfg_result : Result<Config,confy::ConfyError> = confy::load("salat_mv", None);
     let mut cfg = match cfg_result{
         Ok(cfg_result)  => cfg_result,
@@ -388,25 +362,19 @@ fn main(){
     
     
     // main logic
-    // ==========
     
     if flag.help{ // breakout for help
         println!("{}",HELP_TEXT);
         return;
     }
     
-    // data path
-    let mut data_path: String = current_exe().unwrap().parent().unwrap().to_str().unwrap().to_string();
-    data_path.push_str("/ptdata.csv");
-    
     // gets data from database
-    // let raw_prayer_data: String = PT_DAT_RAW.to_string();
-    
-    // let prayer_data: Vec<PrayerData> = raw_prayer_data.parse_for_island(cfg.island_index as i32);
     let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index as u32);
-
+    
+    // gets today - 1
     let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
     
+    // branch
     if flag.tui{
         tui();
     }
@@ -414,29 +382,17 @@ fn main(){
         edit();
     }
     else if flag.active{
-        
         active(prayer_data, &flag);
-        
-        // Command::new("notify-send").args(["--urgency=low","ahahahahahahaha"]).output().expect("failed");
-        // loop{
-        //     std::thread::sleep_ms(1000);
-        //     break;
-        // }
-        
-    }else{
-        
-        prayer_data[today].flag_formatted_output(&flag);
-        
     }
-    
-    // handle_prayer_data(flag, cfg); // run main thing
-    
+    else{    
+        prayer_data[today].flag_formatted_output(&flag);
+    }
 }
 
 
 
 
-
+// ==============
 // smol functions
 // ==============
 
@@ -473,30 +429,17 @@ fn get_number_input() -> Result<usize,std::num::ParseIntError>{
 }
 
 // get db data
-
-
 fn get_island_data(timeset_index: u32) -> Vec<PrayerData>{
     let mut island_data:Vec<PrayerData> = vec![];
+    
     for row in PTDATA{
         if row[0] == timeset_index{
-            let pt_data: PrayerData = PrayerData {
-                island_index: row[0],
-                day    :  row[1],
-                fajr   :  row[2],
-                sun    :  row[3],
-                dhuhur :  row[4],
-                asr    :  row[5],
-                magrib :  row[6],
-                isha   :  row[7],
-            };
+            let pt_data :PrayerData = PrayerData::island_set_from_vec(row.to_vec());
             island_data.append(&mut vec![pt_data]);
         }
     }
-    
-    island_data
-    
+    island_data   
 }
-
 fn get_vec_from_db(db: &str) -> Vec<String>{
     let mut grouped : Vec<&str> = db.split('\n').collect();
     grouped.pop();
