@@ -1,6 +1,8 @@
-use crate::inits::*;
+use crate::structs::*;
 use crate::functions::*;
-use crate::functions::get_vec_from_db;
+
+pub static ATOLLS_DAT : &str = include_str!("./atolls.csv");
+pub static ISLAND_DAT : &str = include_str!("./islands.csv");
 
 pub fn edit(){
     

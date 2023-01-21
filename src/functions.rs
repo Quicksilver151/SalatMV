@@ -1,7 +1,9 @@
 use std::{process::Command, thread};
 use chrono::prelude::*;
+use crate::structs::*;
+
 use crate::flag_parser::*;
-use crate::{PTDATA, TimeConversion, PrayerData};
+use crate::db::PTDATA;
 use signal_hook::{consts::SIGINT, iterator::Signals};
 
 // time converters
