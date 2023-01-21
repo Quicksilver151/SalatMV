@@ -1,11 +1,11 @@
 use std::fs::write;
 
 trait PTDataParse {
-    fn parse_for_island(self, island_index: u32) -> Vec<Vec<u32>>;
+    fn parse_for_island(self) -> Vec<Vec<u32>>;
 }
 
 impl PTDataParse for String{
-    fn parse_for_island(self, island_index: u32) -> Vec<Vec<u32>>{
+    fn parse_for_island(self) -> Vec<Vec<u32>>{
 
         // split by line for each valid data
         let mut grouped :Vec<&str> = self.split('\n').collect();
@@ -56,7 +56,7 @@ fn format_as_rust_vec(pt_data:Vec<Vec<u32>>) -> String{
 
 fn main(){
     let data : &str = include_str!("./src/ptdata.csv");
-    let pt_data = data.to_string().parse_for_island(77);
+    let pt_data = data.to_string().parse_for_island();
     let rust_code = format_as_rust_vec(pt_data);
     write("./src/db.rs", rust_code).unwrap_or(());
     // uneval::to_out_dir(pt_data, "pt_data.rs");
