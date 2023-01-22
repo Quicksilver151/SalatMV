@@ -4,8 +4,6 @@ A cli version of the salat mv mobile app. Used to show prayer times in Maldives.
 
 This program uses the db from the salatmv app
 
-
-
 `~> salat_mv -t`
 
 ```
@@ -32,6 +30,12 @@ only binaries for linux is available
 
 ## Building From Source
 
+## All Platforms (Cargo) (Recommended)
+
+- Install Rust/Cargo on your system
+
+- Run  `cargo install salat_mv`
+
 ### Linux (with the shellscript)
 
 - Install Rust/Cargo on your system
@@ -52,15 +56,11 @@ only binaries for linux is available
 
 - Run `git tag -l` to get a list of tags
 
-- Run `git checkout [version name]` to checkout to the latest tag. eg `git checkout v0.3.1`
+- Run `git checkout [version name]` to checkout to the latest tag. eg `git checkout v0.3.6`
 
 - Run `cargo build --release`
 
-- Copy the csv files from `/src/` to `/target/release/`
-
 - The executable file will be inside `/target/release/`
-
-
 
 # Usage
 
