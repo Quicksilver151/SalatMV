@@ -101,9 +101,11 @@ You can combine multiple flags like `salat_mv -ctH`
 
 - [ ] Add notification editing
 
+- [ ] Notification support for windows & mac
+
 - [ ] Add notification missed message
 
-- [ ] Change edit mode to be more usable
+- [x] Change edit mode to be more usable
 
 - [x] More visual feedback for --current flag
 
