@@ -1,10 +1,4 @@
-use crate::structs::*;
-use chrono::prelude::*;
-use std::{process::Command, thread};
-
-use crate::db::PTDATA;
-use crate::flag_parser::*;
-use signal_hook::{consts::SIGINT, iterator::Signals};
+use crate::*;
 
 // time converters
 pub fn get_current_time_in_minutes() -> u32 {
@@ -57,6 +51,11 @@ pub fn get_island_data(timeset_index: u32) -> Vec<PrayerData> {
     island_data
 }
 pub fn get_vec_from_db(db: &str) -> Vec<String> {
+    let mut vec: Vec<String> = vec![];
+    // for row in ATOLL_DATA{
+    //     dbg!(row);
+    // }
+    // panic!();
     let mut grouped: Vec<&str> = db.split('\n').collect();
     grouped.pop();
     

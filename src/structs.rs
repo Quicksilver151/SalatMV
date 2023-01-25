@@ -1,6 +1,4 @@
-use crate::flag_parser::*;
-use crate::functions::*;
-use serde::{Deserialize, Serialize};
+use crate::*;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Config {
@@ -28,24 +26,24 @@ impl PrayerData {
     pub fn island_set_from_vec(val: Vec<u32>) -> PrayerData {
         PrayerData {
             island_index: val[0],
-            day: val[1],
-            fajr: val[2],
-            sun: val[3],
+            day:    val[1],
+            fajr:   val[2],
+            sun:    val[3],
             dhuhur: val[4],
-            asr: val[5],
+            asr:    val[5],
             magrib: val[6],
-            isha: val[7],
+            isha:   val[7],
         }
     }
 
     pub fn vec_from_island_set(&self) -> Vec<i32> {
         let mut val = vec![0; 6];
-        val[0] = self.fajr as i32;
-        val[1] = self.sun as i32;
+        val[0] = self.fajr   as i32;
+        val[1] = self.sun    as i32;
         val[2] = self.dhuhur as i32;
-        val[3] = self.asr as i32;
+        val[3] = self.asr    as i32;
         val[4] = self.magrib as i32;
-        val[5] = self.isha as i32;
+        val[5] = self.isha   as i32;
 
         val
     }
@@ -101,10 +99,10 @@ impl PrayerData {
                         pt_vec[0] - time_minutes
                     }
                 };
-
+                
                 let tail_prev_len = "-".repeat(10.min(prev_diff.abs() / 10) as usize);
                 let tail_next_len = "-".repeat(10.min(next_diff.abs() / 10) as usize);
-
+                
                 // print!("\t{},\t{},\t{}",prev_diff,diff,next_diff);
                 if diff.is_negative() && next_diff.is_positive() {
                     print!(" /{}", tail_next_len);
@@ -124,7 +122,7 @@ impl PrayerData {
                     print!(" <<------------");
                 }
             }
-
+            
             println!();
         }
     }

@@ -16,31 +16,31 @@ pub enum TimeFormat {
 
 #[derive(Debug, PartialEq)]
 pub struct Flag {
-    pub help: bool,
-    pub tui: bool,
-    pub active: bool,
-    pub notify: bool,
-    pub edit: bool,
+    pub help:    bool,
+    pub tui:     bool,
+    pub active:  bool,
+    pub notify:  bool,
+    pub edit:    bool,
     pub current: bool,
-    pub title: bool,
-    pub disp: DispType,
+    pub title:   bool,
+    pub disp:   DispType,
     pub output: OutType,
-    pub time: TimeFormat,
+    pub time:   TimeFormat,
 }
 
 // default params
 pub fn new_flag() -> Flag {
     Flag {
-        help: false,
-        tui: false,
-        active: false,
-        notify: false,
-        edit: false,
+        help:    false,
+        tui:     false,
+        active:  false,
+        notify:  false,
+        edit:    false,
         current: false,
-        title: false,
-        disp: DispType::Normal,
+        title:   false,
+        disp:   DispType::Normal,
         output: OutType::Hours,
-        time: TimeFormat::TWHour,
+        time:   TimeFormat::TWHour,
     }
 }
 
@@ -80,41 +80,43 @@ pub fn parse_args(mut args: Vec<String>) -> Result<Flag, Flag> {
         if arg_vec.len() == 1 {
             println!("===INVALID FLAG ENTERED===\n\n{}", HELP_TEXT);
             return Err(flag);
-        } else if arg_vec[0] == '-' && arg_vec[1] == '-' {
+        }
+        else if arg_vec[0] == '-' && arg_vec[1] == '-' {
             let argument = arg.strip_prefix("--").unwrap();
             match argument {
-                "help" => flag.help = true,
-                "tui" => flag.tui = true,
-                "active" => flag.active = true,
-                "notify" => flag.notify = true,
-                "edit" => flag.edit = true,
-                "current" => flag.current = true,
-                "title" => flag.title = true,
-                "raw-data" => flag.disp = DispType::Raw,
-                "minutes" => flag.output = OutType::Minutes,
-                "hour" => flag.time = TimeFormat::TFHour,
-                
+                "help"     => flag.help    = true,
+                "tui"      => flag.tui     = true,
+                "active"   => flag.active  = true,
+                "notify"   => flag.notify  = true,
+                "edit"     => flag.edit    = true,
+                "current"  => flag.current = true,
+                "title"    => flag.title   = true,
+                "raw-data" => flag.disp   = DispType::Raw,
+                "minutes"  => flag.output = OutType::Minutes,
+                "hour"     => flag.time   = TimeFormat::TFHour,
                 _ => {
                     println!("===INVALID FLAG ENTERED===\n\n{}", HELP_TEXT);
                     return Err(flag);
                 }
             }
-        } else if arg_vec[0] == '-' {
+            
+        }
+        else if arg_vec[0] == '-' {
             for argchar in arg_vec {
                 if argchar == '-' {
                     continue;
                 }
                 match argchar {
-                    'h' => flag.help = true,
-                    'T' => flag.tui = true,
-                    'a' => flag.active = true,
-                    'n' => flag.notify = true,
-                    'e' => flag.edit = true,
+                    'h' => flag.help    = true,
+                    'T' => flag.tui     = true,
+                    'a' => flag.active  = true,
+                    'n' => flag.notify  = true,
+                    'e' => flag.edit    = true,
                     'c' => flag.current = true,
-                    't' => flag.title = true,
-                    'r' => flag.disp = DispType::Raw,
+                    't' => flag.title   = true,
+                    'r' => flag.disp   = DispType::Raw,
                     'm' => flag.output = OutType::Minutes,
-                    'H' => flag.time = TimeFormat::TFHour,
+                    'H' => flag.time   = TimeFormat::TFHour,
                     
                     _ => {
                         println!("==INVALID FLAG ENTERED===\n\n{}", HELP_TEXT);

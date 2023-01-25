@@ -1,4 +1,4 @@
-use std::fs::write;
+use std::fs::{write, read_to_string};
 
 trait PTDataParse {
     fn parse_for_island(self) -> Vec<Vec<u32>>;
@@ -38,7 +38,39 @@ impl PTDataParse for String{
     }
 }
 
-fn format_as_rust_vec(pt_data:Vec<Vec<u32>>) -> String{
+fn get_vec_from_db(db: &str) -> Vec<String> {
+    let mut grouped: Vec<&str> = db.split('\n').collect();
+    grouped.pop();
+    grouped
+        .iter()
+        .map(|x| x.parse::<String>().unwrap())
+        .collect()
+}
+
+fn format_as_rust_vec(atoll_data: Vec<String>, island_data: Vec<String>) -> String{
+    let mut string : String = String::new();
+    string.push_str("pub static ATOLL_DATA : & [[&str;4]; 20] = &[");
+    for atoll in atoll_data{
+        
+        let item = format!("\n[\"{}\"],",atoll.replace(';', "\",\""));
+        string.push_str(&item);
+    }
+    string.push_str("];\n\n");
+    
+    
+    string.push_str("pub static ISLAND_DATA : & [[&str;10]; 205] = &[");
+    for island in island_data{
+        let item = format!("\n[\"{}\"],",island.replace(';', "\",\""));
+        string.push_str(&item);
+    }
+    string.push_str("];");
+
+    println!("{}",string);
+    string
+    
+}
+
+fn format_as_rust_array(pt_data:Vec<Vec<u32>>) -> String{
     let mut string : String = "".to_string();
     let default_str: String =
 "pub static PTDATA: & [[u32; 8]; 15372] = &[".to_string();
@@ -55,9 +87,17 @@ fn format_as_rust_vec(pt_data:Vec<Vec<u32>>) -> String{
 }
 
 fn main(){
-    let data : &str = include_str!("./src/ptdata.csv");
+    let data : &str = include_str!("./src/data/ptdata.csv");
     let pt_data = data.to_string().parse_for_island();
-    let rust_code = format_as_rust_vec(pt_data);
-    write("./src/db.rs", rust_code).unwrap_or(());
+    let pt_data = format_as_rust_array(pt_data);
+    
+    let atoll_data = get_vec_from_db(&read_to_string("./src/data/atolls.csv").unwrap());
+    let island_dat = get_vec_from_db(&read_to_string("./src/data/islands.csv").unwrap());
+    
+    let atoll_and_island_data = format_as_rust_vec(atoll_data, island_dat);
+    let final_string = format!("{}\n\n{}", atoll_and_island_data, pt_data);
+    
+    write("./src/db.rs", final_string).unwrap_or(());
+    
     // uneval::to_out_dir(pt_data, "pt_data.rs");
 }

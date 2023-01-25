@@ -1,21 +1,23 @@
 // std
-use std::{env, thread::sleep, time::Duration};
+use std::{env, thread, time::Duration, process::Command};
+use thread::sleep;
 
 // crates
 use chrono::prelude::*;
+use serde::{Deserialize, Serialize};
+use db::PTDATA;
+use signal_hook::{consts::SIGINT, iterator::Signals};
 
 // include files
 mod db;
-mod edit;
-mod flag_parser;
 mod functions;
 mod structs;
 
 // use files
-use edit::edit;
-use flag_parser::*;
-use functions::*;
-use structs::*;
+use crate::structs::*;
+use crate::functions::*;
+use crate::db::*;
+// use crate::flag_parser::*;
 
 // ======
 // ACTIVE
@@ -30,7 +32,6 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag) {
         let current_time = get_current_time_in_minutes() as i32;
         let (_, _, seconds, _) = get_current_time(&flag.time);
         
-        // let current_time = 738;
         pt_vec.iter().for_each(|x| {
             if seconds == 0 && x == &current_time && flag.notify {
                 notify_send("ITS TIME")

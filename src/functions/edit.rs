@@ -1,14 +1,13 @@
-use crate::functions::*;
-use crate::structs::*;
+use crate::*;
 
-pub static ATOLLS_DAT: &str = include_str!("./atolls.csv");
-pub static ISLAND_DAT: &str = include_str!("./islands.csv");
+pub static ATOLLS_DAT: &str = include_str!("../data/atolls.csv");
+pub static ISLAND_DAT: &str = include_str!("../data/islands.csv");
 
 pub fn edit() {
     // start new buffer
     print!("\x1b[?1049h");
     println!("EDIT MODE\n changes are made to the config file\n");
-    
+    ATOLL_DATA;
     let raw_atoll_data: Vec<String> = get_vec_from_db(ATOLLS_DAT);
     let raw_island_data: Vec<String> = get_vec_from_db(ISLAND_DAT);
     
