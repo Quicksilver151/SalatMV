@@ -6,6 +6,27 @@ pub struct Config {
     pub island_name: String,
 }
 
+#[derive(Serialize,Deserialize)]
+pub struct AtollData{
+    pub index: u32,
+    pub en_code: String,
+    pub dh_code: String,
+    pub ar_code: String,
+}
+
+impl AtollData{
+    pub fn new_from_array(data: [&str;4]) -> AtollData{
+        let new_atoll_data: AtollData = AtollData {
+            index: data[0].parse::<u32>().unwrap(),
+            en_code: data[1].to_string(),
+            dh_code: data[2].to_string(),
+            ar_code: data[3].to_string(),
+        };
+        
+        new_atoll_data
+    }
+}
+
 #[derive(Debug)]
 pub struct PrayerData {
     pub island_index: u32,
