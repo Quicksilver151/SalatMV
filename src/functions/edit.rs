@@ -1,21 +1,21 @@
 use crate::*;
 
-pub static ATOLLS_DAT: &str = include_str!("../data/atolls.csv");
+// pub static ATOLLS_DAT: &str = include_str!("../data/atolls.csv");
 pub static ISLAND_DAT: &str = include_str!("../data/islands.csv");
 
 pub fn edit() {
     // start new buffer
     print!("\x1b[?1049h");
     println!("EDIT MODE\n changes are made to the config file\n");
-    ATOLL_DATA;
-    let raw_atoll_data: Vec<String> = get_vec_from_db(ATOLLS_DAT);
+    
+    let atoll_data : Vec<AtollData> = ATOLL_DATA.iter().map(|x| AtollData::new_from_array(*x)).collect();
     let raw_island_data: Vec<String> = get_vec_from_db(ISLAND_DAT);
     
     // [row][column:  0,1,2]   (0 = atoll_index, 1=name, 2=dhi_name)
-    let atoll_data: Vec<Vec<&str>> = raw_atoll_data
-        .iter()
-        .map(|x| x.split(';').collect())
-        .collect();
+    // let atoll_data: Vec<Vec<&str>> = raw_atoll_data
+    //     .iter()
+    //     .map(|x| x.split(';').collect())
+    //     .collect();
     
     // [row][coloumn: 0,2,3,4] (0 = time index, 2=atoll, 3=name, 4=dhi_name)
     let island_data: Vec<Vec<&str>> = raw_island_data
@@ -25,14 +25,18 @@ pub fn edit() {
     
     clear_screen();
     // atoll title
-    println!("Index\tName\tDhiName");
-    println!("-----\t----\t-------");
-    
+    // println!("Index\tName\tDhiName");
+    // println!("-----\t----\t-------");
+         println!(
+            "{0: <5} | {1: <10} | {2: <10}",
+            "Index", "Eng Name", "Dhi Name",
+        );
+        println!("-----------------------------");   
     // print atoll list
     atoll_data
         .iter()
-        .for_each(|x| println!("{}\t{}\t{}", x[0], x[1], x[2]));
-    println!("Input a number from the first colum to select Atoll(1 to 20) or select a timeset(41 to 82):");
+        .for_each(|atoll| println!("{0: <5} | {1: <10} | {2: <10}", atoll.index, atoll.en_code, atoll.dh_code));
+    println!("Input a number from the first colum to select Atoll(1-20) or select a timeset(42-82):");
     let selected_atoll_index: usize =
         get_number_input().expect("Must be a non zero positive integer");
     let selected_time_index: usize;

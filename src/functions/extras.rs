@@ -44,12 +44,14 @@ pub fn get_island_data(timeset_index: u32) -> Vec<PrayerData> {
     
     for row in PTDATA {
         if row[0] == timeset_index {
-            let pt_data: PrayerData = PrayerData::island_set_from_vec(row.to_vec());
+            let pt_data: PrayerData = PrayerData::new_from_array(row);
             island_data.append(&mut vec![pt_data]);
         }
     }
+    
     island_data
 }
+
 pub fn get_vec_from_db(db: &str) -> Vec<String> {
     let mut vec: Vec<String> = vec![];
     // for row in ATOLL_DATA{

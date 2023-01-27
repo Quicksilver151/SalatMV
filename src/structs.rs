@@ -43,8 +43,8 @@ impl PrayerData {
     // fn new() -> PrayerData{
     //     PrayerData { island_index: 0, day: 0, fajr: 0, sun: 0, dhuhur: 0, asr: 0, magrib: 0, isha: 0}
     // }
-
-    pub fn island_set_from_vec(val: Vec<u32>) -> PrayerData {
+    
+    pub fn new_from_array(val: &[u32; 8]) -> PrayerData {
         PrayerData {
             island_index: val[0],
             day:    val[1],
