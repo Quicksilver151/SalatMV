@@ -2,18 +2,16 @@ use crate::*;
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Config {
-    pub island_index: usize,
+    pub island_index: u32,
     pub island_name: String,
 }
 
-#[derive(Serialize,Deserialize)]
 pub struct AtollData{
     pub index: u32,
     pub en_code: String,
     pub dh_code: String,
     pub ar_code: String,
 }
-
 impl AtollData{
     pub fn new_from_array(data: [&str;4]) -> AtollData{
         let new_atoll_data: AtollData = AtollData {
@@ -27,23 +25,45 @@ impl AtollData{
     }
 }
 
+pub struct IslandData{
+    pub timeset: u32,
+    pub index:   u32,
+    pub atoll:   u32,
+    pub en_name: String,
+    pub dh_name: String,
+    pub ar_name: String,
+}
+impl IslandData{
+    pub fn new_from_array(data: [&str;10]) -> IslandData{
+        let new_island_data: IslandData = IslandData {
+            timeset: data[0].parse::<u32>().unwrap(),
+            index:   data[1].parse::<u32>().unwrap(),
+            atoll:   data[2].parse::<u32>().unwrap(),
+            en_name: data[3].to_string(),
+            dh_name: data[4].to_string(),
+            ar_name: data[5].to_string(),
+        };
+        
+        new_island_data
+        
+    }
+
+}
+
+
 #[derive(Debug)]
 pub struct PrayerData {
     pub island_index: u32,
-    pub day: u32,
-    pub fajr: u32,
-    pub sun: u32,
+    pub day:    u32,
+    pub fajr:   u32,
+    pub sun:    u32,
     pub dhuhur: u32,
-    pub asr: u32,
+    pub asr:    u32,
     pub magrib: u32,
-    pub isha: u32,
+    pub isha:   u32,
 }
-
 impl PrayerData {
-    // fn new() -> PrayerData{
-    //     PrayerData { island_index: 0, day: 0, fajr: 0, sun: 0, dhuhur: 0, asr: 0, magrib: 0, isha: 0}
-    // }
-    
+       
     pub fn new_from_array(val: &[u32; 8]) -> PrayerData {
         PrayerData {
             island_index: val[0],
@@ -56,7 +76,7 @@ impl PrayerData {
             isha:   val[7],
         }
     }
-
+    
     pub fn vec_from_island_set(&self) -> Vec<i32> {
         let mut val = vec![0; 6];
         val[0] = self.fajr   as i32;
@@ -65,20 +85,20 @@ impl PrayerData {
         val[3] = self.asr    as i32;
         val[4] = self.magrib as i32;
         val[5] = self.isha   as i32;
-
+        
         val
     }
-
+    
     pub fn flag_formatted_output(&self, flag: &Flag) {
         let (flag, pt_vec) = (flag, self.vec_from_island_set());
-
+        
         // some temporary inits
         let names = vec!["Fajr", "Sun", "Dhuhur", "Asr", "Magrib", "Isha"];
-
+        
         // optional title
         if flag.title && !flag.tui && !flag.edit {
             let (hour, minute, second, time) = get_current_time(&flag.time);
-
+            
             println!("Salat_MV-cli");
             println!("---------------------");
             println!(
@@ -92,7 +112,7 @@ impl PrayerData {
             println!("---------------------");
             println!();
         }
-
+        
         for (i, pt) in pt_vec.iter().enumerate() {
             match flag.disp {
                 // only numbers or with info
@@ -165,7 +185,7 @@ impl TimeConversion for i32 {
             self.to_string()
         }
     }
-
+    
     fn to_12(self) -> (u32, String) {
         let half = if self > 11 { "pm" } else { "am" };
         if self > 12 {
@@ -174,17 +194,17 @@ impl TimeConversion for i32 {
             (self as u32, half.to_string())
         }
     }
-
+    
     fn minutes_to_time(self, time_format: &TimeFormat) -> String {
         let minute = &self % 60;
         let mut hour = self as u32 / 60;
         let mut period = "".to_string();
-
+        
         match time_format {
             TimeFormat::TWHour => (hour, period) = hour.to_12(),
             TimeFormat::TFHour => {}
         }
-
+        
         let hour = hour.add_zero();
         let minute = minute.add_zero();
         format!("{}:{} {}", hour, minute, period)
@@ -201,7 +221,7 @@ impl TimeConversion for u32 {
             self.to_string()
         }
     }
-
+    
     fn to_12(self) -> (u32, String) {
         let half = if self > 11 { "pm" } else { "am" };
         if self > 12 {
@@ -210,17 +230,17 @@ impl TimeConversion for u32 {
             (self, half.to_string())
         }
     }
-
+    
     fn minutes_to_time(self, time_format: &TimeFormat) -> String {
         let minute = &self % 60;
         let mut hour = self / 60;
         let mut period = "".to_string();
-
+        
         match time_format {
             TimeFormat::TWHour => (hour, period) = hour.to_12(),
             TimeFormat::TFHour => {}
         }
-
+        
         let hour = hour.add_zero();
         let minute = minute.add_zero();
         format!("{}:{} {}", hour, minute, period)

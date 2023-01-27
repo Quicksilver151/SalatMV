@@ -28,14 +28,14 @@ pub fn get_current_time(format: &TimeFormat) -> (u32, u32, u32, String) {
 }
 
 // input management
-pub fn get_number_input() -> Result<usize, std::num::ParseIntError> {
+pub fn get_number_input() -> Result<u32, std::num::ParseIntError> {
     let mut input_text = String::new();
     std::io::stdin()
         .read_line(&mut input_text)
         .expect("failed to read from stdin");
     
     let trimmed = input_text.trim();
-    trimmed.parse::<usize>()
+    trimmed.parse::<u32>()
 }
 
 // get db data
