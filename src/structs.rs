@@ -154,10 +154,10 @@ impl PrayerData {
                 }
                 if pt_vec[0] > time_minutes || pt_vec[5] < time_minutes {
                     if pt == &pt_vec[5] {
-                        // suffix = format!(" /{}", tail_next_len)
+                        suffix = format!(" /{}", tail_next_len)
                     }
                     if pt == &pt_vec[0] {
-                        // suffix = format!(" \\{}", tail_prev_len)
+                        suffix = format!(" \\{}", tail_prev_len)
                     }
                 }
                 if pt == &time_minutes {
@@ -166,7 +166,7 @@ impl PrayerData {
             }
             
             print!("{}{}{}",prefix, time_display, suffix);
-
+            
             if flag.disp != DispType::Array{println!()}
         }
         if flag.disp == DispType::Array{
