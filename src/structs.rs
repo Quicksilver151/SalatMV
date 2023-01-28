@@ -108,16 +108,21 @@ impl PrayerData {
             println!();
         }
         
+        if flag.disp == DispType::Array{
+            print!("[\"")
+        }
+        
         for (i, pt) in pt_vec.iter().enumerate() {
+            let (mut prefix, mut time_display, mut suffix) = (String::new(),String::new(),String::new());
             match flag.disp {
                 // only numbers or with info
-                DispType::Normal => print!("{}:\t", names[i]),
-                DispType::Raw => print!(""),
-                DispType::Array => todo!(),
+                DispType::Normal => prefix = format!("{}:\t", names[i]),
+                DispType::Raw    => prefix = "".to_owned(),
+                DispType::Array  => suffix = "\",".to_owned(),
             }
             match flag.output {
-                OutType::Hours => print!("{}", pt.minutes_to_time(&flag.time)),
-                OutType::Minutes => print!("{}", pt),
+                OutType::Hours   => time_display = pt.minutes_to_time(&flag.time).to_owned(),
+                OutType::Minutes => time_display = format!("{}", pt),
             }
             if flag.current {
                 let time_minutes: i32 = get_current_time_in_minutes() as i32;
@@ -142,25 +147,30 @@ impl PrayerData {
                 
                 // print!("\t{},\t{},\t{}",prev_diff,diff,next_diff);
                 if diff.is_negative() && next_diff.is_positive() {
-                    print!(" /{}", tail_next_len);
+                    suffix = format!(" /{}", tail_next_len);
                 }
                 if prev_diff.is_negative() && diff.is_positive() {
-                    print!(" \\{}", tail_prev_len);
+                    suffix = format!(" \\{}", tail_prev_len);
                 }
                 if pt_vec[0] > time_minutes || pt_vec[5] < time_minutes {
                     if pt == &pt_vec[5] {
-                        print!(" /{}", tail_next_len)
+                        // suffix = format!(" /{}", tail_next_len)
                     }
                     if pt == &pt_vec[0] {
-                        print!(" \\{}", tail_prev_len)
+                        // suffix = format!(" \\{}", tail_prev_len)
                     }
                 }
                 if pt == &time_minutes {
-                    print!(" <<------------");
+                    suffix = " <<------------".to_string();
                 }
             }
             
-            println!();
+            print!("{}{}{}",prefix, time_display, suffix);
+
+            if flag.disp != DispType::Array{println!()}
+        }
+        if flag.disp == DispType::Array{
+            println!("]")
         }
     }
 }

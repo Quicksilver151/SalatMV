@@ -97,7 +97,7 @@ fn main() {
     // branch
     if flag.tui {
         // tui();
-        println!("not added yet");
+        println!("tui mode not added yet");
     } else if flag.edit {
         edit();
     } else if flag.active {

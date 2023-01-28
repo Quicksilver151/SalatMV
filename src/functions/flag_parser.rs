@@ -52,13 +52,13 @@ Usage: salat_mv [option]
 
 Options:
     -h, --help       shows this help section
-    -T, --tui        runs in tui mode (not implemented yet)
     -a, --active     keeps the program always running
     -n, --notify     enables notifications when using -a, edits notifications when not using -a (requires \'notify-send\' command)
     -e, --edit       edit island index
     -c, --current    indicates the current time
     -t, --title      shows the title bar
-    -r, --raw-data   outputs raw data in hours and minutes
+    -r, --raw-data   outputs raw data in hours and minutes (incompatible with -A)
+    -A, --array      outputs the data in an array (incompatible with -r, -c)
     -m, --minutes    outputs raw data in minutes
     -H, --hour       show time in 24 hour format
     
@@ -93,6 +93,7 @@ pub fn parse_args(mut args: Vec<String>) -> Result<Flag, Flag> {
                 "current"  => flag.current = true,
                 "title"    => flag.title   = true,
                 "raw-data" => flag.disp   = DispType::Raw,
+                "array"    => flag.disp   = DispType::Array,
                 "minutes"  => flag.output = OutType::Minutes,
                 "hour"     => flag.time   = TimeFormat::TFHour,
                 _ => {
@@ -116,9 +117,9 @@ pub fn parse_args(mut args: Vec<String>) -> Result<Flag, Flag> {
                     'c' => flag.current = true,
                     't' => flag.title   = true,
                     'r' => flag.disp   = DispType::Raw,
+                    'A' => flag.disp   = DispType::Array,
                     'm' => flag.output = OutType::Minutes,
                     'H' => flag.time   = TimeFormat::TFHour,
-                    
                     _ => {
                         println!("==INVALID FLAG ENTERED===\n\n{}", HELP_TEXT);
                         return Err(flag);
