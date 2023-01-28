@@ -1,6 +1,6 @@
 [package]
 name = "salat_mv"
-version = "0.3.11"
+version = "0.3.12"
 authors = ["DefaultCube <quicksilverhq151@gmail.com>"]
 license = "MIT"
 description = "A tool to show prayer times in The Maldives"
