@@ -118,7 +118,14 @@ impl PrayerData {
                 // only numbers or with info
                 DispType::Normal => prefix = format!("{}:\t", names[i]),
                 DispType::Raw    => prefix = "".to_owned(),
-                DispType::Array  => suffix = "\",".to_owned(),
+                DispType::Array  => suffix = {
+                    if i == 5 {
+                        "\"".to_owned()
+                    }
+                    else{
+                        "\", \"".to_owned()
+                    }
+                },
             }
             match flag.output {
                 OutType::Hours   => time_display = pt.minutes_to_time(&flag.time).to_owned(),
