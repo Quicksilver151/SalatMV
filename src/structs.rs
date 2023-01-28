@@ -35,19 +35,15 @@ pub struct IslandData{
 }
 impl IslandData{
     pub fn new_from_array(data: [&str;10]) -> IslandData{
-        let new_island_data: IslandData = IslandData {
+        IslandData {
             timeset: data[0].parse::<u32>().unwrap(),
             index:   data[1].parse::<u32>().unwrap(),
             atoll:   data[2].parse::<u32>().unwrap(),
             en_name: data[3].to_string(),
             dh_name: data[4].to_string(),
             ar_name: data[5].to_string(),
-        };
-        
-        new_island_data
-        
+        }   
     }
-
 }
 
 
@@ -63,7 +59,6 @@ pub struct PrayerData {
     pub isha:   u32,
 }
 impl PrayerData {
-       
     pub fn new_from_array(val: &[u32; 8]) -> PrayerData {
         PrayerData {
             island_index: val[0],
@@ -118,6 +113,7 @@ impl PrayerData {
                 // only numbers or with info
                 DispType::Normal => print!("{}:\t", names[i]),
                 DispType::Raw => print!(""),
+                DispType::Array => todo!(),
             }
             match flag.output {
                 OutType::Hours => print!("{}", pt.minutes_to_time(&flag.time)),

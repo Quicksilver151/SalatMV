@@ -2,6 +2,7 @@
 pub enum DispType {
     Normal,
     Raw,
+    Array,
 }
 #[derive(Debug, PartialEq)]
 pub enum OutType {

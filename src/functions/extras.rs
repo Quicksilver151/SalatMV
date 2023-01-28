@@ -52,21 +52,6 @@ pub fn get_island_data(timeset_index: u32) -> Vec<PrayerData> {
     island_data
 }
 
-pub fn get_vec_from_db(db: &str) -> Vec<String> {
-    let mut vec: Vec<String> = vec![];
-    // for row in ATOLL_DATA{
-    //     dbg!(row);
-    // }
-    // panic!();
-    let mut grouped: Vec<&str> = db.split('\n').collect();
-    grouped.pop();
-    
-    grouped
-        .iter()
-        .map(|x| x.parse::<String>().unwrap())
-        .collect()
-}
-
 // terminal screen functions
 pub fn clear_screen() {
     print!("\x1B[2J");

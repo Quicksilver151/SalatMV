@@ -27,7 +27,7 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag) {
     
     // active loop
     loop {
-        let today: usize = chrono::offset::Local::now().ordinal() as usize;
+        let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
         let pt_vec = prayer_data[today - 1].vec_from_island_set();
         let current_time = get_current_time_in_minutes() as i32;
         let (_, _, seconds, _) = get_current_time(&flag.time);
@@ -89,7 +89,7 @@ fn main() {
     }
     
     // gets data from database
-    let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index as u32);
+    let prayer_data: Vec<PrayerData> = get_island_data(cfg.island_index);
     
     // gets today - 1
     let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
