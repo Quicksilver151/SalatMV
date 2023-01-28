@@ -4,20 +4,20 @@ A cli version of the salat mv mobile app. Used to show prayer times in Maldives.
 
 This program uses the db from the salatmv app
 
-`~> salat_mv -t`
+`~> salat_mv -ct`
 
 ```
 Salat_MV-cli
 ---------------------
-Time   :  10:07:01 pm
+Time   :  06:34:05 pm
 ---------------------
 
-Fajr:   04:50 am
-Sun:    06:07 am
-Dhuhur: 12:15 pm
-Asr:    03:37 pm
-Magrib: 06:16 pm
-Isha:   07:33 pm
+Fajr:   05:01 am
+Sun:    06:15 am
+Dhuhur: 12:24 pm
+Asr:    03:44 pm
+Magrib: 06:24 pm /------
+Isha:   07:39 pm \-
 ```
 
 # Installation
@@ -73,21 +73,21 @@ Usage: salat_mv [option]
 
 Options:
     -h, --help       shows this help section
-    -T, --tui        runs in tui mode (not implemented yet)
     -a, --active     keeps the program always running
     -n, --notify     enables notifications when using -a, edits notifications when not using -a (requires 'notify-send' command)
     -e, --edit       edit island index
     -c, --current    indicates the current time
     -t, --title      shows the title bar
-    -r, --raw-data   outputs raw data in hours and minutes
+    -r, --raw-data   outputs raw data in hours and minutes (incompatible with -A)
+    -A, --array      outputs the data in an array (incompatible with -r, -c)
     -m, --minutes    outputs raw data in minutes
     -H, --hour       show time in 24 hour format
-
+    
 config contains island index
 config is stored in ~/.config/salat_mv/
 ```
 
-You can combine multiple flags like `salat_mv -ctH`
+You can combine multiple flags like `salat_mv -cantH` (this will run it in always active mode with 24 Hour display while indicating the current time and showing a title bar)
 
 # Todo:
 
@@ -103,7 +103,7 @@ You can combine multiple flags like `salat_mv -ctH`
 
 - [ ] Notification support for windows & mac
 
-- [ ] Add notification missed message
+- [x] ~~Add notification missed message~~
 
 - [x] Change edit mode to be more usable
 
