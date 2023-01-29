@@ -102,8 +102,7 @@ impl PrayerData {
                 minute.add_zero(),
                 second.add_zero(),
                 time
-            ); // TODO: let flag -H work
-               // println!("Island :  {}",cfg.island_name);
+            );
             println!("---------------------");
             println!();
         }

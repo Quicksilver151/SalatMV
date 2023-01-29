@@ -106,3 +106,18 @@ fn main() {
         prayer_data[today].flag_formatted_output(&flag);
     }
 }
+
+
+
+//
+// #[cfg(test)]
+// mod test{
+//     use super::main;
+//     
+//     #[test]
+//     fn test_this(){
+//         assert_eq!(main(),(1));
+//     }
+//     println!("testing 1 2 3");
+// }
+
