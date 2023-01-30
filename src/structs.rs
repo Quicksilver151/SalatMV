@@ -199,7 +199,7 @@ impl TimeConversion for i32 {
     }
     
     fn to_12(self) -> (u32, String) {
-        let half = if self > 11 { "pm" } else { "am" };
+        let half = if self > 11 { " pm" } else { " am" };
         if self > 12 {
             (self as u32 - 12, half.to_string())
         } else {
@@ -219,7 +219,7 @@ impl TimeConversion for i32 {
         
         let hour = hour.add_zero();
         let minute = minute.add_zero();
-        format!("{}:{} {}", hour, minute, period)
+        format!("{}:{}{}", hour, minute, period)
     }
 }
 
@@ -235,7 +235,7 @@ impl TimeConversion for u32 {
     }
     
     fn to_12(self) -> (u32, String) {
-        let half = if self > 11 { "pm" } else { "am" };
+        let half = if self > 11 { " pm" } else { " am" };
         if self > 12 {
             (self - 12, half.to_string())
         } else {
@@ -255,6 +255,6 @@ impl TimeConversion for u32 {
         
         let hour = hour.add_zero();
         let minute = minute.add_zero();
-        format!("{}:{} {}", hour, minute, period)
+        format!("{}:{}{}", hour, minute, period)
     }
 }
