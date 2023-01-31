@@ -97,7 +97,7 @@ impl PrayerData {
             println!("Salat_MV-cli");
             println!("---------------------");
             println!(
-                "Time   :  {}:{}:{} {}",
+                "Time   :  {}:{}:{}{}",
                 hour.add_zero(),
                 minute.add_zero(),
                 second.add_zero(),
@@ -199,7 +199,7 @@ impl TimeConversion for i32 {
     }
     
     fn to_12(self) -> (u32, String) {
-        let half = if self > 11 { " pm" } else { " am" };
+        let half = if self > 11 { " PM" } else { " AM" };
         if self > 12 {
             (self as u32 - 12, half.to_string())
         } else {
@@ -235,7 +235,7 @@ impl TimeConversion for u32 {
     }
     
     fn to_12(self) -> (u32, String) {
-        let half = if self > 11 { " pm" } else { " am" };
+        let half = if self > 11 { " PM" } else { " AM" };
         if self > 12 {
             (self - 12, half.to_string())
         } else {
