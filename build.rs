@@ -1,4 +1,6 @@
-use std::fs::{write, read_to_string};
+use std::fs::{self, write, read_to_string};
+use std::env;
+use std::path::Path;
 
 trait PTDataParse {
     fn parse_for_island(self) -> Vec<Vec<u32>>;
@@ -97,7 +99,10 @@ fn main(){
     let atoll_and_island_data = format_as_rust_vec(atoll_data, island_dat);
     let final_string = format!("{}\n\n{}", atoll_and_island_data, pt_data);
     
-    write("./src/db.rs", final_string).unwrap_or(());
+    let out_dir = env::var_os("OUT_DIR").unwrap();
+    let dest_path = Path::new(&out_dir).join("db.rs");
     
-    // uneval::to_out_dir(pt_data, "pt_data.rs");
+    write(dest_path, final_string).unwrap_or(());
+    
+    println!("cargo:rerun-if-changed=build.rs")   
 }

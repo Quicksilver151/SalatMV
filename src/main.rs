@@ -5,18 +5,17 @@ use thread::sleep;
 // crates
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
-use db::PTDATA;
 use signal_hook::{consts::SIGINT, iterator::Signals};
 
 // include files
-mod db;
+include!(concat!(env!("OUT_DIR"), "/db.rs"));
 mod functions;
 mod structs;
 
 // use files
 use crate::structs::*;
 use crate::functions::*;
-use crate::db::*;
+
 // use crate::flag_parser::*;
 
 // ======
