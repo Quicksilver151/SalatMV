@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use signal_hook::{consts::SIGINT, iterator::Signals};
 
 // include files
-include!(concat!(env!("OUT_DIR"), "/db.rs"));
+include!(concat!(env!("OUT_DIR"), "/db.rs")); // build script output
 mod functions;
 mod structs;
 
