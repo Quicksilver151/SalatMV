@@ -81,7 +81,7 @@ pub fn handle_ctrlc() {
 // notifications
 pub fn notify_send(message: &str) {
     Command::new("notify-send")
-        .args(["--urgency=critical", message])
+        .args(["--app-name=Salat MV","--urgency=critical", message])
         .output()
         .expect("failed");
 }

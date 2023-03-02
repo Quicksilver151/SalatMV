@@ -24,6 +24,11 @@ use crate::functions::*;
 fn active(prayer_data: Vec<PrayerData>, flag: &Flag) {
     new_buffer();
     
+    
+    let pt_names: Vec<_> = vec![" Fajr"," Sun"," Dhuhur"," Asr"," Maghrib"," Isha"];
+    // symbols 
+    // pt_names.iter().for_each(|x| notify_send(x));
+    
     // active loop
     loop {
         let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
@@ -31,11 +36,13 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag) {
         let current_time = get_current_time_in_minutes() as i32;
         let (_, _, seconds, _) = get_current_time(&flag.time);
         
-        pt_vec.iter().for_each(|x| {
+        for (i, x) in pt_vec.iter().enumerate(){
+            
             if seconds == 0 && x == &current_time && flag.notify {
-                notify_send("ITS TIME")
+                let notif_text = pt_names[i];
+                notify_send(notif_text);
             }
-        });
+        };
         
         prayer_data[today].flag_formatted_output(flag);
         sleep(Duration::from_secs(1));
