@@ -6,6 +6,7 @@ use thread::sleep;
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use signal_hook::{consts::SIGINT, iterator::Signals};
+use colored::*;
 
 // include files
 include!(concat!(env!("OUT_DIR"), "/db.rs")); // build script output
@@ -24,11 +25,10 @@ use crate::functions::*;
 fn active(prayer_data: Vec<PrayerData>, flag: &Flag) {
     new_buffer();
     
-    
     let pt_names: Vec<_> = vec![" Fajr"," Sun"," Dhuhur"," Asr"," Maghrib"," Isha"];
     // symbols 
     // pt_names.iter().for_each(|x| notify_send(x));
-    
+    print!("\x1b[0;34m");
     // active loop
     loop {
         let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;

@@ -1,5 +1,6 @@
 use crate::*;
 
+
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Config {
     pub island_index: u32,
@@ -85,6 +86,8 @@ impl PrayerData {
     }
     
     pub fn flag_formatted_output(&self, flag: &Flag) {
+        use colored::*;
+        
         let (flag, pt_vec) = (flag, self.vec_from_island_set());
         
         // some temporary inits
@@ -258,3 +261,49 @@ impl TimeConversion for u32 {
         format!("{}:{}{}", hour, minute, period)
     }
 }
+
+
+// // The 8 standard colors.
+// #[derive(PartialEq, Eq)]
+// pub enum Color {
+//     Black,
+//     Red,
+//     Green,
+//     Yellow,
+//     Blue,
+//     Magenta,
+//     Cyan,
+//     White,
+// }
+// pub trait Colorize{
+//     fn colorize(&self, color:Color) -> String;
+// }
+// impl Colorize for &'static str {
+//     fn colorize(&self, color:Color) -> String{
+//         match color{
+//             Color::Black   => format!("\x1b[1;30m{self}\x1b[0m"),
+//             Color::Red     => format!("\x1b[1;31m{self}\x1b[0m"),
+//             Color::Green   => format!("\x1b[1;32m{self}\x1b[0m"),
+//             Color::Yellow  => format!("\x1b[1;33m{self}\x1b[0m"),
+//             Color::Blue    => format!("\x1b[1;34m{self}\x1b[0m"),
+//             Color::Magenta => format!("\x1b[1;35m{self}\x1b[0m"),
+//             Color::Cyan    => format!("\x1b[1;36m{self}\x1b[0m"),
+//             Color::White   => format!("\x1b[1;37m{self}\x1b[0m"),
+//         }
+//     }
+// }
+// impl Colorize for String {
+//     fn colorize(&self, color:Color) -> String{
+//         match color{
+//             Color::Black   => format!("\x1b[1;30m{self}\x1b[0m"),
+//             Color::Red     => format!("\x1b[1;31m{self}\x1b[0m"),
+//             Color::Green   => format!("\x1b[1;32m{self}\x1b[0m"),
+//             Color::Yellow  => format!("\x1b[1;33m{self}\x1b[0m"),
+//             Color::Blue    => format!("\x1b[1;34m{self}\x1b[0m"),
+//             Color::Magenta => format!("\x1b[1;35m{self}\x1b[0m"),
+//             Color::Cyan    => format!("\x1b[1;36m{self}\x1b[0m"),
+//             Color::White   => format!("\x1b[1;37m{self}\x1b[0m"),
+//         }
+//     }
+// }
+
