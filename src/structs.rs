@@ -91,23 +91,31 @@ impl PrayerData {
         let (flag, pt_vec) = (flag, self.vec_from_island_set());
         
         // some temporary inits
-        let names = vec!["Fajr", "Sun", "Dhuhur", "Asr", "Magrib", "Isha"];
+        let names : Vec<ColoredString> = vec![
+            "Fajr"  .blue().bold(),
+            "Sun"   .blue().bold(),
+            "Dhuhur".blue().bold(),
+            "Asr"   .blue().bold(),
+            "Magrib".blue().bold(),
+            "Isha"  .blue().bold(),
+        ];
         
         // optional title
         if flag.title && !flag.tui && !flag.edit {
             let (hour, minute, second, time) = get_current_time(&flag.time);
-            let title = "Salat_MV-cli".red();
+            let title = "    Salat_MV-cli".red().bold();
             
             println!("{}",title);
-            println!("---------------------");
-            println!(
-                "Time   :  {}:{}:{}{}",
+            println!("{}","---------------------".red());
+            let time_display = format!(
+                "Time   {}  {}:{}:{}{}",":".red(),
                 hour.add_zero(),
                 minute.add_zero(),
                 second.add_zero(),
                 time
-            );
-            println!("---------------------");
+            ).blue().bold();
+            println!("{}",time_display);
+            println!("{}","---------------------".red());
             println!();
         }
         
@@ -119,7 +127,7 @@ impl PrayerData {
             let (mut prefix, mut time_display, mut suffix) = (String::new(),String::new(),String::new());
             match flag.disp {
                 // only numbers or with info
-                DispType::Normal => prefix = format!("{}:\t", names[i]),
+                DispType::Normal => prefix = format!("{}{}\t", names[i], ":".blue().bold()),
                 DispType::Raw    => prefix = "".to_owned(),
                 DispType::Array  => suffix = {
                     if i == 5 {
