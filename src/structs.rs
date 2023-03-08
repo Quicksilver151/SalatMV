@@ -96,8 +96,9 @@ impl PrayerData {
         // optional title
         if flag.title && !flag.tui && !flag.edit {
             let (hour, minute, second, time) = get_current_time(&flag.time);
+            let title = "Salat_MV-cli".red();
             
-            println!("Salat_MV-cli");
+            println!("{}",title);
             println!("---------------------");
             println!(
                 "Time   :  {}:{}:{}{}",
