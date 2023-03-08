@@ -28,7 +28,7 @@ fn active(prayer_data: Vec<PrayerData>, flag: &Flag) {
     let pt_names: Vec<_> = vec![" Fajr"," Sun"," Dhuhur"," Asr"," Maghrib"," Isha"];
     // symbols 
     // pt_names.iter().for_each(|x| notify_send(x));
-    print!("\x1b[0;34m");
+    
     // active loop
     loop {
         let today: usize = chrono::offset::Local::now().ordinal() as usize - 1;
