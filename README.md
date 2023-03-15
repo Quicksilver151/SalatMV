@@ -4,6 +4,10 @@ A cli version of the salat mv mobile app. Used to show prayer times in Maldives.
 
 This program uses the db from the salatmv app
 
+![Screenshot_20230316_032642](https://user-images.githubusercontent.com/56493793/225458747-a99470ea-2b04-4f07-9b54-0eeb600d37e8.png)
+
+
+
 `~> salat_mv -ct`
 
 ```
@@ -20,13 +24,8 @@ Magrib: 06:24 pm /------
 Isha:   07:39 pm \-
 ```
 
+
 # Installation
-
-## Release Binaries
-
-You can find the releases in the [releases](https://github.com/Quicksilver151/SalatMV/releases) tab
-
-only binaries for linux is available
 
 ## Building From Source
 
