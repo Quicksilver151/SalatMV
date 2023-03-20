@@ -46,21 +46,20 @@ pub fn new_flag() -> Flag {
 }
 
 pub const HELP_TEXT : &str =
-"SalatMV for cli
+"\x1b[1;31mSalatMV for cli\x1b[0m
+\x1b[1;35mUsage:\x1b[1;34m salat_mv \x1b[1;35m[option] \x1b[0m
 
-Usage: salat_mv [option]
-
-Options:
-    -h, --help       shows this help section
-    -a, --active     keeps the program always running
-    -n, --notify     enables notifications when using -a, edits notifications when not using -a (requires \'notify-send\' command)
-    -e, --edit       edit island index
-    -c, --current    indicates the current time
-    -t, --title      shows the title bar
-    -r, --raw-data   outputs raw data in hours and minutes (incompatible with -A)
-    -A, --array      outputs the data in an array (incompatible with -r, -c)
-    -m, --minutes    outputs raw data in minutes
-    -H, --hour       show time in 24 hour format
+\x1b[1;31mOptions:,\x1b[0m
+    \x1b[1;35m-h\x1b[0m, \x1b[1;35m--help       \x1b[0mshows this help section
+    \x1b[1;35m-a\x1b[0m, \x1b[1;35m--active     \x1b[0mkeeps the program always running
+    \x1b[1;35m-n\x1b[0m, \x1b[1;35m--notify     \x1b[0menables notifications when using -a, edits notifications when not using -a (requires \'notify-send\' command)
+    \x1b[1;35m-e\x1b[0m, \x1b[1;35m--edit       \x1b[0medit island index
+    \x1b[1;35m-c\x1b[0m, \x1b[1;35m--current    \x1b[0mindicates the current time
+    \x1b[1;35m-t\x1b[0m, \x1b[1;35m--title      \x1b[0mshows the title bar
+    \x1b[1;35m-r\x1b[0m, \x1b[1;35m--raw-data   \x1b[0moutputs raw data in hours and minutes (incompatible with -A)
+    \x1b[1;35m-A\x1b[0m, \x1b[1;35m--array      \x1b[0moutputs the data in an array (incompatible with -r, -c)
+    \x1b[1;35m-m\x1b[0m, \x1b[1;35m--minutes    \x1b[0moutputs raw data in minutes
+    \x1b[1;35m-H\x1b[0m, \x1b[1;35m--hour       \x1b[0mshow time in 24 hour format
     
 config contains island index
 config is stored in ~/.config/salat_mv/";
