@@ -22,13 +22,13 @@ pub fn edit() {
     // println!("-----\t----\t-------");
          println!(
             "{0: <5} | {1: <10} | {2: <10}",
-            "Index", "Eng Name", "Dhi Name",
+            "Index".red(), "Eng Name".red(), "Dhi Name".red(),
         );
-        println!("-----------------------------");   
+        println!("{}","-----------------------------");   
     // print atoll list
     atoll_data
         .iter()
-        .for_each(|atoll| println!("{0: <5} | {1: <10} | {2: <10}", atoll.index, atoll.en_code, atoll.dh_code));
+        .for_each(|atoll| println!("{0: <5} | {1: <10} | {2: <10}", atoll.index.to_string().blue(), atoll.en_code, atoll.dh_code));
     
     println!("\nInput a number from the first colum to select Atoll(1-20) or select a timeset(42-82):");
     
@@ -40,9 +40,9 @@ pub fn edit() {
         // island title
         println!(
             "{0: <5} | {1: <7} | {2: <15} | {3: <10}",
-            "Index", "Timeset", "Island Name", "Dhi Name"
+            "Index".red(), "Timeset".red(), "Island Name".red(), "Dhi Name".red()
         );
-        println!("-------------------------------------------");
+        println!("{}","-------------------------------------------");
         
         let mut i = 0;
         let mut selectables: Vec<u32> = vec![];
@@ -54,7 +54,7 @@ pub fn edit() {
                 selectables.append(&mut vec![island.timeset]);
                 println!(
                     "{0: <5} | {1: <7} | {2: <15} | {3: <10}",
-                    i, island.timeset, island.en_name, island.dh_name
+                    i.to_string().blue(), island.timeset, island.en_name, island.dh_name
                 );
             }
         }
