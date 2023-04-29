@@ -6,8 +6,6 @@ This program uses the db from the salatmv app
 
 ![Screenshot_20230316_032642](https://user-images.githubusercontent.com/56493793/225458747-a99470ea-2b04-4f07-9b54-0eeb600d37e8.png)
 
-
-
 `~> salat_mv -ct`
 
 ```
@@ -23,7 +21,6 @@ Asr:    03:44 pm
 Magrib: 06:24 pm /------
 Isha:   07:39 pm \-
 ```
-
 
 # Installation
 
@@ -77,16 +74,39 @@ Options:
     -e, --edit       edit island index
     -c, --current    indicates the current time
     -t, --title      shows the title bar
-    -r, --raw-data   outputs raw data in hours and minutes (incompatible with -A)
-    -A, --array      outputs the data in an array (incompatible with -r, -c)
+    -r, --raw-data   outputs raw data in hours and minutes
+    -A, --array      outputs the data in an array
     -m, --minutes    outputs raw data in minutes
     -H, --hour       show time in 24 hour format
-    
+
 config contains island index
 config is stored in ~/.config/salat_mv/
 ```
 
-You can combine multiple flags like `salat_mv -cantH` (this will run it in always active mode with 24 Hour display while indicating the current time and showing a title bar)
+
+
+# Examples:
+
+- You can combine multiple flags like `salat_mv -cantH` (this will run it in always active mode with 24 Hour display while indicating the current time and showing a title bar)
+
+- You can run `salat_mv -A` to get a list of times in an array format like:
+
+    `["04:46 AM", "05:58 AM", "12:09 PM", "03:25 PM", "06:10 PM", "07:24 PM"]`
+
+- You can run `salat_mv -r` to get raw data (without printing all the decorations) like:
+  
+  ```
+  04:46 AM
+  05:58 AM
+  12:09 PM
+  03:25 PM
+  06:10 PM
+  07:24 PM
+  ```
+
+# 
+
+
 
 # Todo:
 
