@@ -77,7 +77,7 @@ fn main() {
         cfg.island_name = "Male'".to_string();
     }
     
-    confy::store("salat_mv", None, &cfg).unwrap();
+    confy::store("salat_mv", "config", &cfg).unwrap();
     
     // fetch flags
     let args: Vec<String> = env::args().collect();

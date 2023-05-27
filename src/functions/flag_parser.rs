@@ -1,21 +1,26 @@
-#[derive(Debug, PartialEq)]
+use std::default;
+
+#[derive(Debug, PartialEq, Default)]
 pub enum DispType {
+    #[default]
     Normal,
     Raw,
     Array,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub enum OutType {
+    #[default]
     Hours,
     Minutes,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub enum TimeFormat {
+    #[default]
     TWHour,
     TFHour,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Flag {
     pub help:    bool,
     pub tui:     bool,
@@ -27,22 +32,6 @@ pub struct Flag {
     pub disp:   DispType,
     pub output: OutType,
     pub time:   TimeFormat,
-}
-
-// default params
-pub fn new_flag() -> Flag {
-    Flag {
-        help:    false,
-        tui:     false,
-        active:  false,
-        notify:  false,
-        edit:    false,
-        current: false,
-        title:   false,
-        disp:   DispType::Normal,
-        output: OutType::Hours,
-        time:   TimeFormat::TWHour,
-    }
 }
 
 pub const HELP_TEXT : &str =
@@ -73,7 +62,7 @@ pub fn parse_args(mut args: Vec<String>) -> Result<Flag, Flag> {
     
     // println!("{:?}",args);
     
-    let mut flag: Flag = new_flag();
+    let mut flag: Flag = Flag::default();
     
     for arg in args {
         let arg_vec: Vec<char> = arg.chars().collect::<Vec<char>>();
