@@ -17,7 +17,7 @@ edition = "2021"
 strip = true
 
 [dependencies]
-chrono = "0.4.23"
+chrono = "0.4.24"
 colored = "2.0.0"
 confy = "0.5.1"
 serde = { version = "1.0.151", features = ["derive"] }
