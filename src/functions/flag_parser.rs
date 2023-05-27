@@ -1,5 +1,3 @@
-use std::default;
-
 #[derive(Debug, PartialEq, Default)]
 pub enum DispType {
     #[default]
