@@ -32,13 +32,7 @@ Isha:   07:39 pm \-
 
 - Run  `cargo install salat_mv`
 
-### Linux (with the shellscript)
 
-- Install Rust/Cargo on your system
-- Run `git tag -l` to get a list of tags
-- Run `git checkout [version]` to checkout to the latest tag (regular commits are not stable)
-- Run `build_for_linux.sh`
-- A file link should be available in ./target
 
 ### All Platforms (manually)
 
@@ -83,8 +77,6 @@ config contains island index
 config is stored in ~/.config/salat_mv/
 ```
 
-
-
 # Examples:
 
 - You can combine multiple flags like `salat_mv -cantH` (this will run it in always active mode with 24 Hour display while indicating the current time and showing a title bar)
@@ -105,8 +97,6 @@ config is stored in ~/.config/salat_mv/
   ```
 
 # 
-
-
 
 # Todo:
 
