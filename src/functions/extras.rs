@@ -80,8 +80,10 @@ pub fn handle_ctrlc() {
 
 // notifications
 pub fn notify_send(message: &str) {
-    Command::new("notify-send")
+    match Command::new("notify-send")
         .args(["--app-name=Salat MV","--urgency=critical", message])
-        .output()
-        .expect("failed");
+        .output(){
+            Ok(_)  => println!("Prayer time"),
+            Err(_) => println!("Could not find a notification daemon that supports sendings notifs via 'notify-send'"),
+        }
 }
